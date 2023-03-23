@@ -1,0 +1,32 @@
+{
+    "name": "terminal42/deployer-encore",
+    "description": "",
+    "keywords": [],
+    "homepage": "",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "terminal42 gmbh",
+            "homepage": "http://www.terminal42.ch"
+        }
+    ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/terminal42"
+        },
+        {
+            "type": "other",
+            "url": "https://ko-fi.com/terminal42"
+        }
+    ],
+    "require": {
+        "deployer/deployer": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terminal42\\DeployerEncore\\": "src/"
+        }
+    }
+}
