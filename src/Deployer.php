@@ -70,7 +70,7 @@ class Deployer
 
         if (null !== $publicURL) {
             $this->clearOpcache = true;
-            $host->set('public_url', $publicURL);
+            $host->set('public_url', rtrim($publicURL, '/'));
         }
 
         if (null === $htaccessFile && is_file(rtrim(get('public_path'), '/').'/.htaccess_'.$name)) {
