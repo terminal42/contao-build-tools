@@ -29,6 +29,7 @@ class Deployer
     private bool $installContaoManager = true;
     private bool $lockContaoManager = true;
     private bool $lockInstallTool = true;
+    private bool $useMaintenanceMode = true;
     private bool $migrateDatabase = true;
     private bool $migrateDatabaseWithDeletes = false;
     private string|null $buildAssets = null;
@@ -152,6 +153,13 @@ class Deployer
     public function lockDeployment(bool $lock = true): self
     {
         $this->lockDeployment = $lock;
+
+        return $this->reset();
+    }
+
+    public function useMaintenanceMode(bool $maintenanceMode = true): self
+    {
+        $this->useMaintenanceMode = $maintenanceMode;
 
         return $this->reset();
     }
@@ -285,7 +293,10 @@ class Deployer
             $body[] = 'contao:install:lock';
         }
 
-        $body[] = 'contao:maintenance:enable';
+        if ($this->useMaintenanceMode) {
+            $body[] = 'contao:maintenance:enable';
+        }
+
         $body[] = 'deploy:symlink';
 
         if ($this->clearOpcache) {
@@ -301,7 +312,9 @@ class Deployer
             }
         }
 
-        $body[] =  'contao:maintenance:disable';
+        if ($this->useMaintenanceMode) {
+            $body[] =  'contao:maintenance:disable';
+        }
 
         if ($this->lockDeployment) {
             $body[] = 'deploy:unlock';
