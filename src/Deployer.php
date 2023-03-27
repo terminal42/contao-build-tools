@@ -37,8 +37,8 @@ class Deployer
     private bool $includeSystemModules = false;
     private array $addUploadPaths = [];
     private array $removeUploadPaths = [];
-    private array $sharedDirs;
-    private array $sharedFiles;
+    private array $sharedDirs = [];
+    private array $sharedFiles = [];
 
     public function __construct(private string|null $hostname = null, private string|null $remoteUser = null, string $phpBinary = null)
     {
