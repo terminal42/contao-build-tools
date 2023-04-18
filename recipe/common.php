@@ -16,7 +16,7 @@ task('deploy:opcache', static function () {
         return;
     }
 
-    run('cd {{release_path}} && echo "<?php opcache_reset();" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
+    run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
 });
 
 // Task: Composer self update
