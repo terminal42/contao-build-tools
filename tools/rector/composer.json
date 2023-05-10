@@ -1,0 +1,11 @@
+{
+    "require": {
+        "contao/contao-rector": "dev-main"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/contao/contao-rector.git"
+        }
+    ]
+}

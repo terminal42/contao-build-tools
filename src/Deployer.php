@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Terminal42\DeployerEncore;
+namespace Terminal42\ContaoBuildTools;
 
 use Deployer\Host\Host;
 use function Deployer\add;

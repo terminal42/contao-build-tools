@@ -1,9 +1,9 @@
 {
-    "name": "terminal42/deployer-encore",
-    "description": "",
-    "keywords": [],
-    "homepage": "",
-    "type": "library",
+    "name": "terminal42/contao-build-tools",
+    "type": "composer-plugin",
+    "description": "Highly opinionated build tool setup for Contao websites.",
+    "keywords": ["contao", "ci", "cq", "code-style", "rector"],
+    "homepage": "https://github.com/terminal42/contao-build-tools",
     "license": "MIT",
     "authors": [
         {
@@ -22,11 +22,18 @@
         }
     ],
     "require": {
-        "deployer/deployer": "^7.0"
+        "composer-plugin-api": "^1.1 || ^2.0"
+    },
+    "require-dev": {
+        "deployer/deployer": "^7.0",
+        "composer/composer": "^1.1 || ^2.0"
     },
     "autoload": {
         "psr-4": {
-            "Terminal42\\DeployerEncore\\": "src/"
+            "Terminal42\\ContaoBuildTools\\": "src/"
         }
+    },
+    "extra": {
+        "class": "Terminal42\\ContaoBuildTools\\ComposerPlugin"
     }
 }
