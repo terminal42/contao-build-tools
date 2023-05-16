@@ -43,7 +43,7 @@ class Deployer
 
     public function __construct(private string|null $hostname = null, private string|null $remoteUser = null, string $phpBinary = null)
     {
-        require_once __DIR__.'/../recipe/common.php';
+        require_once __DIR__.'/../deployer/common.php';
 
         if (null !== $phpBinary) {
             set('bin/php', $phpBinary);
