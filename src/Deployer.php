@@ -192,7 +192,7 @@ class Deployer
         set('default_timeout', $this->timeout);
         set('allow_anonymous_stats', false);
 
-        add('shared_dirs', $this->sharedDirs);
+        add('shared_dirs', $this->getSharedDirs());
         add('shared_files', $this->sharedFiles);
 
         task('deploy:upload', $this->uploadClosure());
@@ -324,6 +324,19 @@ class Deployer
         $body[] = 'deploy:success';
 
         return $body;
+    }
+
+    private function getSharedDirs(): array
+    {
+        $sharedDirs = $this->sharedDirs;
+
+        $composerConfig = json_decode(file_get_contents('./composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($composerConfig['require']['isotope/isotope-core'])) {
+            $sharedDirs[] = 'isotope';
+        }
+
+        return array_unique($sharedDirs);
     }
 
     private function getSystemModulesPaths(): array
