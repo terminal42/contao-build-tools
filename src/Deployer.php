@@ -336,6 +336,10 @@ class Deployer
             $sharedDirs[] = 'isotope';
         }
 
+        if (isset($composerConfig['require']['terminal42/contao-avatar'])) {
+            $sharedDirs[] = 'assets/avatars';
+        }
+
         return array_unique($sharedDirs);
     }
 
