@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Contao\Rector\Set\ContaoLevelSetList;
 use Contao\Rector\Set\ContaoSetList;
 use Rector\Config\RectorConfig;
+use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Set\ValueObject\LevelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -18,7 +19,11 @@ return static function (RectorConfig $rectorConfig): void {
         switch($composerJson['require']['php'] ?? null) {
             case '^8.1':
             case '8.1.*':
-                $rectorConfig->sets([LevelSetList::UP_TO_PHP_81, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES]);
+                $rectorConfig->sets([
+                    LevelSetList::UP_TO_PHP_81,
+                    ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES,
+                    DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+                ]);
                 break;
         }
     }
