@@ -72,6 +72,23 @@ use Terminal42\ContaoBuildTools\Deployer;
 ```
 
 
+## Error tracking with [Sentry.io][Sentry]
+
+The `Terminal42\ContaoBuildTools\ErrorHandlingTrait` adds useful Sentry helpers.
+
+ - `ErrorHandlingTrait::sentryOrThrow` will either log an error/exception to sentry,
+    or it will throw an exception if Sentry integration is not available (e.g. on localhost
+    or in `dev` environment). It is mostly useful when running looping cronjobs, like 
+    synchronizing Contao with a remote system, so an error on syncing a record will not prevent
+    the sync loop from finishing other records.
+
+ - `ErrorHandlingTraig::sentryCheckIn` has been added for the new [Sentry Cron job monitoring][SentryCron].
+    Call `sentryCheckIn()` without argument to start a check in, and subsequently with a boolean
+    `true` or `false` after the job has successfully run or failed.
+
+
 [Deployer]: https://deployer.org
+[Sentry]: https://sentry.io
+[SentryCron]: https://docs.sentry.io/product/crons/
 [SFBP]: https://symfony.com/doc/current/best_practices.html
 [SBPB]: https://symfony.com/doc/current/bundles/best_practices.html
