@@ -164,7 +164,7 @@ class Deployer
         return $this->reset();
     }
 
-    public function buildsAssets(string $publicDir = 'layout', string $buildCommand = 'yarn build'): self
+    public function buildAssets(string $publicDir = 'layout', string $buildCommand = 'yarn build'): self
     {
         $this->addUploadPaths[] = rtrim(get('public_path'), '/').'/'.ltrim($publicDir, '/');
         $this->buildAssets = $buildCommand;
