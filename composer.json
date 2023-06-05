@@ -26,7 +26,8 @@
     },
     "require-dev": {
         "deployer/deployer": "^7.0",
-        "composer/composer": "^1.1 || ^2.0"
+        "composer/composer": "^1.1 || ^2.0",
+        "sentry/sentry-symfony": "^4.0"
     },
     "autoload": {
         "psr-4": {
