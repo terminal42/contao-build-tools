@@ -56,7 +56,7 @@ To use the Deployer helper, you first need to require Deployer in your `composer
 ```php
 <?php
 
-require_once 'vendor/terminal42/contao-builds-tools/src/Deployer.php';
+require_once 'vendor/terminal42/contao-build-tools/src/Deployer.php';
 
 use Terminal42\ContaoBuildTools\Deployer;
 
@@ -64,7 +64,7 @@ use Terminal42\ContaoBuildTools\Deployer;
     ->addTarget('prod', '/path/to/deployment', 'https://example.org')
     ->buildAssets()
     ->includeSystemModules()
-    ->addPaths(
+    ->addUploadPaths(
         // some additional directory
     )
     ->run()
