@@ -3,12 +3,19 @@
 declare(strict_types=1);
 
 use Contao\EasyCodingStandard\Fixer\TypeHintOrderFixer;
+use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Option;
 
 return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->paths([getcwd().'/src']);
     $ecsConfig->sets([__DIR__.'/vendor/contao/easy-coding-standard/config/contao.php']);
+
+    $skip = [
+        MethodChainingIndentationFixer::class => [
+            '*/DependencyInjection/Configuration.php',
+        ],
+    ];
 
     if (file_exists(getcwd().'/composer.json')) {
         $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
@@ -19,11 +26,12 @@ return static function (ECSConfig $ecsConfig): void {
                 break;
 
             default:
-                $ecsConfig->skip([TypeHintOrderFixer::class]);
+                $skip[] = TypeHintOrderFixer::class;
                 break;
         }
     }
 
+    $ecsConfig->skip($skip);
     $ecsConfig->parallel();
     $ecsConfig->lineEnding("\n");
 
