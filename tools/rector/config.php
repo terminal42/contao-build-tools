@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Contao\Rector\Set\ContaoLevelSetList;
 use Contao\Rector\Set\ContaoSetList;
 use Rector\Config\RectorConfig;
@@ -11,7 +13,17 @@ use Rector\Set\ValueObject\LevelSetList;
 return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->paths([getcwd().'/src']);
-    $rectorConfig->sets([ContaoLevelSetList::UP_TO_CONTAO_413]);
+
+    $versionParser = new VersionParser();
+
+    $setList = match (true) {
+        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '4.9.*') => ContaoLevelSetList::UP_TO_CONTAO_49,
+        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '4.13.*') => ContaoLevelSetList::UP_TO_CONTAO_413,
+        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '5.0.*') => ContaoLevelSetList::UP_TO_CONTAO_50,
+        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '5.1.*') => ContaoLevelSetList::UP_TO_CONTAO_51,
+    };
+
+    $rectorConfig->sets([$setList]);
 
     if (file_exists(getcwd().'/composer.json')) {
         $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
@@ -28,7 +40,9 @@ return static function (RectorConfig $rectorConfig): void {
         }
     }
 
-    require_once getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php';
+    if (file_exists(getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php')) {
+        require_once getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php';
+    }
 
     if (!\defined('TL_MODE')) {
         \define('TL_MODE', 'FE');

@@ -22,7 +22,8 @@
         }
     ],
     "require": {
-        "composer-plugin-api": "^1.1 || ^2.0"
+        "composer-plugin-api": "^1.1 || ^2.0",
+        "composer/semver": "^3.0"
     },
     "require-dev": {
         "deployer/deployer": "^7.0",
