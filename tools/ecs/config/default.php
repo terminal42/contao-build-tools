@@ -5,11 +5,10 @@ declare(strict_types=1);
 use Contao\EasyCodingStandard\Fixer\TypeHintOrderFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Option;
 
 return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->paths([getcwd().'/src']);
-    $ecsConfig->sets([__DIR__.'/vendor/contao/easy-coding-standard/config/contao.php']);
+    $ecsConfig->sets([__DIR__.'/../vendor/contao/easy-coding-standard/config/contao.php']);
 
     $skip = [
         MethodChainingIndentationFixer::class => [
@@ -35,6 +34,5 @@ return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->parallel();
     $ecsConfig->lineEnding("\n");
 
-    $parameters = $ecsConfig->parameters();
-    $parameters->set(Option::CACHE_DIRECTORY, sys_get_temp_dir().'/ecs_default_cache');
+    $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_default_cache');
 };

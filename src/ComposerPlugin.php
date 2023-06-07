@@ -29,7 +29,9 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 
         if (!\array_keys($scripts, 'cs-fixer')) {
             $scripts['cs-fixer'] = [
-                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/default.php --fix --ansi'
+                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/default.php --fix --ansi',
+                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/contao.php --fix --ansi',
+                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/template.php --fix --ansi',
             ];
         }
 
