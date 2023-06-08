@@ -12,8 +12,6 @@ use Rector\Set\ValueObject\LevelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
 
-    $rectorConfig->paths([getcwd().'/src']);
-
     $versionParser = new VersionParser();
 
     $setList = match (true) {

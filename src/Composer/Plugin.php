@@ -31,19 +31,27 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $scripts = $composer->getPackage()->getScripts();
 
-        if (!\array_keys($scripts, 'cs-fixer')) {
-            $this->activatedScripts['cs-fixer'] = 'Run code style fixes on the project files [terminal42/contao-build-tools].';
-            $scripts['cs-fixer'] = [
-                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/default.php --fix --ansi',
-                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/contao.php --fix --ansi',
-                '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/template.php --fix --ansi',
-            ];
-        }
+        $this->registerConfigScript(
+            'cs-fixer',
+            'Run code style fixes on the project files [terminal42/contao-build-tools].',
+            '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
+            [
+                'default' => ['./src', './tests'],
+                'contao' => ['./contao'],
+                'template' => ['./templates', './contao/templates'],
+            ],
+            $scripts,
+        );
 
-        if (!\array_keys($scripts, 'rector')) {
-            $this->activatedScripts['rector'] = 'Run Rector on the project files [terminal42/contao-build-tools].';
-            $scripts['rector'] = ['@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector --config vendor/terminal42/contao-build-tools/tools/rector/config.php --ansi'];
-        }
+        $this->registerConfigScript(
+            'rector',
+            'Run Rector on the project files [terminal42/contao-build-tools].',
+            '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
+            [
+                'config' => ['./src', './tests']
+            ],
+            $scripts
+        );
 
         $composer->getPackage()->setScripts($scripts);
     }
@@ -139,6 +147,39 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             if ($command instanceof BaseCommand) {
                 $command->resetComposer();
             }
+        }
+    }
+
+    private function registerConfigScript(string $name, string $description, string $command, array $configs, array &$scripts): void
+    {
+        if (\array_keys($scripts, $name)) {
+            return;
+        }
+
+        foreach ($configs as $config => $paths) {
+            foreach ($paths as $k => $path) {
+                if (!is_dir($path)) {
+                    unset($paths[$k]);
+                }
+            }
+
+            if (empty($paths)) {
+                continue;
+            }
+
+            if (!isset($scripts[$name])) {
+                $scripts[$name] = [];
+            }
+
+            $scripts[$name][] = sprintf(
+                $command,
+                implode(' ', $paths),
+                $config
+            );
+        }
+
+        if (!empty($scripts[$name])) {
+            $this->activatedScripts[$name] = $description;
         }
     }
 }

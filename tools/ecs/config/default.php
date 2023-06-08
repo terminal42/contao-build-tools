@@ -7,7 +7,6 @@ use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->paths([getcwd().'/src']);
     $ecsConfig->sets([__DIR__.'/../vendor/contao/easy-coding-standard/config/contao.php']);
 
     $skip = [
