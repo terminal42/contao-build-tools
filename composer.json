@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "composer-plugin-api": "^1.1 || ^2.0",
+        "composer-plugin-api": "^2.0",
         "composer/semver": "^3.0"
     },
     "require-dev": {
@@ -36,6 +36,6 @@
         }
     },
     "extra": {
-        "class": "Terminal42\\ContaoBuildTools\\ComposerPlugin"
+        "class": "Terminal42\\ContaoBuildTools\\Composer\\Plugin"
     }
 }

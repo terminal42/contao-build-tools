@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Terminal42\ContaoBuildTools;
+namespace Terminal42\ContaoBuildTools\Composer;
 
 use Composer\Command\BaseCommand;
 use Composer\Composer;
@@ -10,6 +10,8 @@ use Composer\Console\Application;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Factory;
 use Composer\IO\IOInterface;
+use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
+use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
@@ -17,8 +19,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ComposerPlugin implements PluginInterface, EventSubscriberInterface
+class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
+    public array $activatedScripts = [];
+
     public function activate(Composer $composer, IOInterface $io): void
     {
         if (!file_exists(getcwd().'/src')) {
@@ -28,6 +32,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         $scripts = $composer->getPackage()->getScripts();
 
         if (!\array_keys($scripts, 'cs-fixer')) {
+            $this->activatedScripts['cs-fixer'] = 'Run code style fixes on the project files [terminal42/contao-build-tools].';
             $scripts['cs-fixer'] = [
                 '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/default.php --fix --ansi',
                 '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check --config vendor/terminal42/contao-build-tools/tools/ecs/config/contao.php --fix --ansi',
@@ -36,6 +41,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         if (!\array_keys($scripts, 'rector')) {
+            $this->activatedScripts['rector'] = 'Run Rector on the project files [terminal42/contao-build-tools].';
             $scripts['rector'] = ['@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector --config vendor/terminal42/contao-build-tools/tools/rector/config.php --ansi'];
         }
 
@@ -50,6 +56,11 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
     public function uninstall(Composer $composer, IOInterface $io): void
     {
         // Nothing to do here
+    }
+
+    public function getCapabilities(): array
+    {
+        return [CommandProviderCapability::class => CommandProvider::class];
     }
 
     public function installTools(Event $event): void
@@ -85,7 +96,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         $application = new Application();
         $output = Factory::createOutput();
 
-        $binRoots = glob(__DIR__.'/../tools/*', GLOB_ONLYDIR);
+        $binRoots = glob(__DIR__.'/../../tools/*', GLOB_ONLYDIR);
         if (empty($binRoots)) {
             $io->writeError('<warning>Couldn\'t find any tool namespace.</warning>');
 
