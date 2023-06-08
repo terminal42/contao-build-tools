@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Composer\InstalledVersions;
 use Composer\Semver\VersionParser;
 use Contao\Rector\Set\ContaoLevelSetList;
 use Contao\Rector\Set\ContaoSetList;
@@ -12,29 +11,42 @@ use Rector\Set\ValueObject\LevelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
 
+    if (!file_exists(getcwd().'/composer.json')) {
+        throw new \RuntimeException('No composer.json found.');
+    }
+
     $versionParser = new VersionParser();
+    $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-    $setList = match (true) {
-        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '4.9.*') => ContaoLevelSetList::UP_TO_CONTAO_49,
-        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '4.13.*') => ContaoLevelSetList::UP_TO_CONTAO_413,
-        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '5.0.*') => ContaoLevelSetList::UP_TO_CONTAO_50,
-        InstalledVersions::satisfies($versionParser, 'contao/core-bundle', '5.1.*') => ContaoLevelSetList::UP_TO_CONTAO_51,
-    };
+    if ($contaoConstraint = $composerJson['require']['contao/core-bundle'] ?? $composerJson['require']['contao/manager-bundle'] ?? null) {
+        $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
 
-    $rectorConfig->sets([$setList]);
+        $setList = match (true) {
+            $parsedConstraints->matches($versionParser->parseConstraints('4.9.*')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
+            $parsedConstraints->matches($versionParser->parseConstraints('4.13.*')) => [ContaoLevelSetList::UP_TO_CONTAO_413],
+            $parsedConstraints->matches($versionParser->parseConstraints('5.0.*')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
+            $parsedConstraints->matches($versionParser->parseConstraints('5.1.*')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
+        };
 
-    if (file_exists(getcwd().'/composer.json')) {
-        $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        if (!empty($setList)) {
+            $rectorConfig->sets($setList);
+        }
+    }
 
-        switch($composerJson['require']['php'] ?? null) {
-            case '^8.1':
-            case '8.1.*':
-                $rectorConfig->sets([
-                    LevelSetList::UP_TO_PHP_81,
-                    ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES,
-                    DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-                ]);
-                break;
+    if ($contaoConstraint = $composerJson['require']['php'] ?? null) {
+        $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
+
+        $setList = match (true) {
+            $parsedConstraints->matches($versionParser->parseConstraints('8.0.*')) => [LevelSetList::UP_TO_PHP_80],
+            $parsedConstraints->matches($versionParser->parseConstraints('8.1.*')) => [
+                LevelSetList::UP_TO_PHP_81,
+                ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES,
+                DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+            ],
+        };
+
+        if (!empty($setList)) {
+            $rectorConfig->sets($setList);
         }
     }
 
