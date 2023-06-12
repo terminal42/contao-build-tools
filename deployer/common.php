@@ -11,6 +11,11 @@ require_once 'recipe/contao.php';
 
 // Task: clear opcache
 task('deploy:opcache', static function () {
+    if (has('opcache_command')) {
+        run('{{opcache_command}}');
+        return;
+    }
+
     if (!has('public_url')) {
         info(' … skipped');
         return;
