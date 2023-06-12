@@ -7,7 +7,9 @@ use Contao\Rector\Set\ContaoLevelSetList;
 use Contao\Rector\Set\ContaoSetList;
 use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\LevelSetList;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
 return static function (RectorConfig $rectorConfig): void {
 
@@ -49,6 +51,15 @@ return static function (RectorConfig $rectorConfig): void {
             $rectorConfig->sets($setList);
         }
     }
+
+    $rectorConfig->skip([
+        ClassPropertyAssignToConstructorPromotionRector::class => [
+            '*/Entity/'
+        ],
+        TypedPropertyFromAssignsRector::class => [
+            '*/Entity/'
+        ],
+    ]);
 
     if (file_exists(getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php')) {
         require_once getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php';

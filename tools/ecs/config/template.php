@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer;
+use PhpCsFixer\Fixer\ControlStructure\ControlStructureBracesFixer;
 use PhpCsFixer\Fixer\ControlStructure\NoAlternativeSyntaxFixer;
 use PhpCsFixer\Fixer\FunctionNotation\VoidReturnFixer;
 use PhpCsFixer\Fixer\PhpTag\BlankLineAfterOpeningTagFixer;
@@ -28,6 +29,7 @@ return static function (ECSConfig $ecsConfig): void {
         StrictParamFixer::class,
         VisibilityRequiredFixer::class,
         VoidReturnFixer::class,
+        ControlStructureBracesFixer::class,
     ]);
 
     $ecsConfig->parallel();
