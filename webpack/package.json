@@ -8,6 +8,7 @@
         "autoprefixer": "^10.4.12",
         "file-loader": "^6.0.0",
         "image-webpack-loader": "^7.0.1",
+        "postcss": "^8.1.0",
         "postcss-loader": "^7.0.0",
         "sass": "^1.35.1",
         "sass-loader": "^13.0.0",

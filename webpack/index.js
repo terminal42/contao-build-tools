@@ -29,6 +29,9 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
         .configureDevServerOptions(() => ({
             allowedHosts: 'all',
             watchFiles: ['config/*', 'contao/**/*', 'src/**/*', 'templates/**/*', 'translations/**/*'],
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            }
         }))
     ;
 
