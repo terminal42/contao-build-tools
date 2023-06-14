@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Composer\Semver\VersionParser;
 use Contao\EasyCodingStandard\Fixer\TypeHintOrderFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
@@ -16,16 +17,15 @@ return static function (ECSConfig $ecsConfig): void {
     ];
 
     if (file_exists(getcwd().'/composer.json')) {
+        $versionParser = new VersionParser();
         $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        switch($composerJson['require']['php'] ?? null) {
-            case '^8.1':
-            case '8.1.*':
-                break;
+        if ($phpConstraint = $composerJson['require']['php'] ?? null) {
+            $parsedConstraints = $versionParser->parseConstraints($phpConstraint);
 
-            default:
+            if ($parsedConstraints->matches($versionParser->parseConstraints('< 8'))) {
                 $skip[] = TypeHintOrderFixer::class;
-                break;
+            }
         }
     }
 

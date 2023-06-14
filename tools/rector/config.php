@@ -35,10 +35,14 @@ return static function (RectorConfig $rectorConfig): void {
         }
     }
 
-    if ($contaoConstraint = $composerJson['require']['php'] ?? null) {
-        $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
+    if ($phpConstraint = $composerJson['require']['php'] ?? null) {
+        $parsedConstraints = $versionParser->parseConstraints($phpConstraint);
 
         $setList = match (true) {
+            $parsedConstraints->matches($versionParser->parseConstraints('7.1.*')) => [LevelSetList::UP_TO_PHP_71],
+            $parsedConstraints->matches($versionParser->parseConstraints('7.2.*')) => [LevelSetList::UP_TO_PHP_72],
+            $parsedConstraints->matches($versionParser->parseConstraints('7.3.*')) => [LevelSetList::UP_TO_PHP_73],
+            $parsedConstraints->matches($versionParser->parseConstraints('7.4.*')) => [LevelSetList::UP_TO_PHP_74],
             $parsedConstraints->matches($versionParser->parseConstraints('8.0.*')) => [LevelSetList::UP_TO_PHP_80],
             $parsedConstraints->matches($versionParser->parseConstraints('8.1.*')) => [
                 LevelSetList::UP_TO_PHP_81,
@@ -76,5 +80,6 @@ return static function (RectorConfig $rectorConfig): void {
         \define('TL_PATH', '/');
     }
 
+    $rectorConfig->fileExtensions(['.php', '.html5']);
     $rectorConfig->parallel();
 };

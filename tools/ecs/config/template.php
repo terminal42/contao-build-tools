@@ -16,7 +16,7 @@ use SlevomatCodingStandard\Sniffs\Namespaces\ReferenceUsedNamesOnlySniff;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->sets([__DIR__.'/../vendor/contao/easy-coding-standard/config/contao.php']);
+    $ecsConfig->sets([__DIR__.'/default.php']);
 
     $ecsConfig->skip([
         BlankLineAfterOpeningTagFixer::class,
@@ -31,9 +31,6 @@ return static function (ECSConfig $ecsConfig): void {
         VoidReturnFixer::class,
         ControlStructureBracesFixer::class,
     ]);
-
-    $ecsConfig->parallel();
-    $ecsConfig->lineEnding("\n");
 
     $ecsConfig->fileExtensions(['html5']);
     $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_template_cache');
