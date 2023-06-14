@@ -97,16 +97,16 @@ class Deployer
         return $this->reset();
     }
 
-    public function addUploadPaths(string ...$paths): self
+    public function addUploadPaths(string|\Closure ...$paths): self
     {
-        $this->addUploadPaths = array_unique(array_merge($this->addUploadPaths, $paths));
+        $this->addUploadPaths = array_merge($this->addUploadPaths, $paths);
 
         return $this->reset();
     }
 
-    public function removeUploadPaths(string ...$paths): self
+    public function removeUploadPaths(string|\Closure ...$paths): self
     {
-        $this->removeUploadPaths = array_unique(array_merge($this->removeUploadPaths, $paths));
+        $this->removeUploadPaths = array_merge($this->removeUploadPaths, $paths);
 
         return $this->reset();
     }
@@ -238,15 +238,17 @@ class Deployer
             $paths = array_merge($paths, $this->getSystemModulesPaths());
         }
 
-        $paths = array_merge($paths, $this->addUploadPaths);
-        $paths = array_diff($paths, $this->removeUploadPaths);
-
-        return static function () use ($paths) {
+        return function () use ($paths) {
             $localPaths = array_values($paths);
+
+            $localPaths = array_merge($localPaths, $this->pathClosure($this->addUploadPaths));
+            $localPaths = array_diff($localPaths, $this->pathClosure($this->removeUploadPaths));
 
             if ($htaccess = currentHost()->get('htaccess_filename')) {
                 $localPaths[] = rtrim(get('public_path'), '/').'/'.$htaccess;
             }
+
+            $localPaths = array_unique($localPaths);
 
             foreach ($localPaths as $path) {
                 upload($path, '{{release_path}}/', [
@@ -363,5 +365,21 @@ class Deployer
         }
 
         return $paths;
+    }
+
+    private function pathClosure(array $paths): array
+    {
+        $result = [];
+
+        foreach ($paths as $path) {
+            if (!$path instanceof \Closure) {
+                $result[] = $path;
+                continue;
+            }
+
+            $result = [...$result, ...(array) $path()];
+        }
+
+        return $result;
     }
 }
