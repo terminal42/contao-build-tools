@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Terminal42\ContaoBuildTools;
 
+use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Deployer\Host\Host;
 use function Deployer\add;
 use function Deployer\currentHost;
@@ -193,6 +195,8 @@ class Deployer
 
     public function run(): self
     {
+        require_once('./vendor/autoload.php');
+
         set('keep_releases', $this->keepReleases);
         set('default_timeout', $this->timeout);
         set('allow_anonymous_stats', false);
@@ -296,7 +300,7 @@ class Deployer
             }
         }
 
-        if ($this->lockInstallTool) {
+        if ($this->lockInstallTool && !$this->isContao5()) {
             $body[] = 'contao:install:lock';
         }
 
@@ -320,7 +324,7 @@ class Deployer
         }
 
         if ($this->useMaintenanceMode) {
-            $body[] =  'contao:maintenance:disable';
+            $body[] = 'contao:maintenance:disable';
         }
 
         if ($this->lockDeployment) {
@@ -345,6 +349,10 @@ class Deployer
 
         if (isset($composerConfig['require']['terminal42/contao-avatar'])) {
             $sharedDirs[] = 'assets/avatars';
+        }
+
+        if ($this->isContao5()) {
+            $sharedDirs[] = 'var/deferred-images';
         }
 
         return array_unique($sharedDirs);
@@ -381,5 +389,10 @@ class Deployer
         }
 
         return $result;
+    }
+
+    private function isContao5(): bool
+    {
+        return InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', '^5.0');
     }
 }
