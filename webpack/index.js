@@ -26,12 +26,12 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
             use: ['image-webpack-loader']
         })
 
-        .configureDevServerOptions(() => ({
+        .configureDevServerOptions((options) => Object.assign({}, options, {
+            static: false,
+            hot: true,
+            liveReload: true,
             allowedHosts: 'all',
             watchFiles: ['config/*', 'contao/**/*', 'src/**/*', 'templates/**/*', 'translations/**/*'],
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-            }
         }))
     ;
 
