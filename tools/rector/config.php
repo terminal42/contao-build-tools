@@ -20,7 +20,7 @@ return static function (RectorConfig $rectorConfig): void {
     $versionParser = new VersionParser();
     $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-    if ($contaoConstraint = $composerJson['require']['contao/core-bundle'] ?? $composerJson['require']['contao/manager-bundle'] ?? null) {
+    if ($contaoConstraint = $composerJson['require']['contao/core-bundle'] ?? $composerJson['require']['contao/manager-bundle'] ?? $composerJson['require-dev']['contao/core-bundle'] ?? $composerJson['require-dev']['contao/manager-bundle'] ?? null) {
         $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
 
         $setList = match (true) {
@@ -80,6 +80,6 @@ return static function (RectorConfig $rectorConfig): void {
         \define('TL_PATH', '/');
     }
 
-    $rectorConfig->fileExtensions(['.php', '.html5']);
+    $rectorConfig->fileExtensions(['php', 'html5']);
     $rectorConfig->parallel();
 };
