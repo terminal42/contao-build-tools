@@ -9,6 +9,7 @@ use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\LevelSetList;
+use Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -62,6 +63,9 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         TypedPropertyFromAssignsRector::class => [
             '*/Entity/'
+        ],
+        ContainerGetToConstructorInjectionRector::class => [
+            '*/Model/'
         ],
     ]);
 
