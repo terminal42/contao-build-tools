@@ -268,7 +268,7 @@ class Deployer
         if (null !== $this->buildAssets) {
             task('deploy:build-assets', function () {
                 runLocally($this->buildAssets);
-            });
+            })->once();
 
             $body[] = 'deploy:build-assets';
         }
