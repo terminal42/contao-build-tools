@@ -191,7 +191,7 @@ class Deployer
         return $this->reset();
     }
 
-    public function run(\Closure $custom): self
+    public function run(): self
     {
         require_once('./vendor/autoload.php');
 
@@ -204,10 +204,6 @@ class Deployer
 
         task('deploy:upload', $this->uploadClosure());
         task('deploy', $this->deployBody());
-
-        if (null !== $custom) {
-            $custom($this);
-        }
 
         return $this;
     }
