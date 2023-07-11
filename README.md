@@ -45,7 +45,7 @@ To use the Deployer helper, you first need to require Deployer in your `composer
 ```json
 {
     "require-dev": {
-        "terminal42/contao-builds-tools": "dev-main",
+        "terminal42/contao-build-tools": "dev-main",
         "deployer/deployer": "^7.0"
     }
 }
