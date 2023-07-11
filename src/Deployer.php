@@ -27,7 +27,6 @@ class Deployer
 
     // Custom tasks
     private bool $clearOpcache = false;
-    private bool $hasHtaccess = false;
     private bool $installContaoManager = true;
     private bool $lockContaoManager = true;
     private bool $lockInstallTool = true;
@@ -85,7 +84,6 @@ class Deployer
         }
 
         if (null !== $htaccessFile) {
-            $this->hasHtaccess = true;
             $host->set('htaccess_filename', $htaccessFile);
         }
 
@@ -193,7 +191,7 @@ class Deployer
         return $this->reset();
     }
 
-    public function run(): self
+    public function run(\Closure $custom): self
     {
         require_once('./vendor/autoload.php');
 
@@ -202,10 +200,14 @@ class Deployer
         set('allow_anonymous_stats', false);
 
         add('shared_dirs', $this->getSharedDirs());
-        add('shared_files', $this->sharedFiles);
+        add('shared_files', $this->getSharedFiles());
 
         task('deploy:upload', $this->uploadClosure());
         task('deploy', $this->deployBody());
+
+        if (null !== $custom) {
+            $custom($this);
+        }
 
         return $this;
     }
@@ -287,10 +289,7 @@ class Deployer
         $body[] = 'deploy:upload';
         $body[] = 'deploy:composer-self-update';
         $body[] = 'deploy:vendors';
-
-        if ($this->hasHtaccess) {
-            $body[] = 'deploy:htaccess';
-        }
+        $body[] = 'deploy:htaccess';
 
         if ($this->installContaoManager) {
             $body[] = 'contao:manager:download';
@@ -341,6 +340,21 @@ class Deployer
     {
         $sharedDirs = $this->sharedDirs;
 
+        // Contao 4.13 (might already be defined in the default contao.php recipe but we want to be independent here)
+        $sharedDirs[] = 'assets/images'; // image thumbnails
+        $sharedDirs[] = 'files'; // file uploads
+        $sharedDirs[] = '{{public_path}}/share'; // share directory for news sitemaps
+        $sharedDirs[] = 'var/backups'; // backup directory
+        $sharedDirs[] = 'var/logs'; // log directory
+        $sharedDirs[] = 'system/tmp'; // some extensions and even the core still upload to system/tmp
+
+        // Add or remove contao-manager directory
+        if ($this->installContaoManager) {
+            $sharedDirs[] = 'contao-manager';
+        } else {
+            $sharedDirs = array_diff($sharedDirs, ['contao-manager']);
+        }
+
         $composerConfig = json_decode(file_get_contents('./composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         if (isset($composerConfig['require']['isotope/isotope-core'])) {
@@ -351,11 +365,29 @@ class Deployer
             $sharedDirs[] = 'assets/avatars';
         }
 
+        if (InstalledVersions::satisfies(new VersionParser(), 'terminal42/notification_center', '^2.0')) {
+            $sharedDirs[] = 'var/nc_bulky_items';
+        }
+
         if ($this->isContao5()) {
-            $sharedDirs[] = 'var/deferred-images';
+            $sharedDirs[] = 'var/deferred-images'; // Deferred image meta data
+            $sharedDirs[] = 'assets/previews'; // File preview thumbnails
         }
 
         return array_unique($sharedDirs);
+    }
+
+    private function getSharedFiles(): array
+    {
+        $sharedFiles = $this->sharedFiles;
+
+        // If a composer auth is required, and it exists locally, we can assume it also needs to exist on the server
+        // as a shared file
+        if (file_exists('auth.json')) {
+            $sharedFiles[] = 'auth.json';
+        }
+
+        return array_unique($sharedFiles);
     }
 
     private function getSystemModulesPaths(): array
