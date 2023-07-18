@@ -25,10 +25,11 @@ return static function (RectorConfig $rectorConfig): void {
         $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
 
         $setList = match (true) {
-            $parsedConstraints->matches($versionParser->parseConstraints('4.9.*')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
-            $parsedConstraints->matches($versionParser->parseConstraints('4.13.*')) => [ContaoLevelSetList::UP_TO_CONTAO_413],
-            $parsedConstraints->matches($versionParser->parseConstraints('5.0.*')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
-            $parsedConstraints->matches($versionParser->parseConstraints('5.1.*')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 4.9')) => [],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 4.10')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 5.0')) => [ContaoLevelSetList::UP_TO_CONTAO_413],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
+            $parsedConstraints->matches($versionParser->parseConstraints('^5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
         };
 
         if (!empty($setList)) {
@@ -40,12 +41,13 @@ return static function (RectorConfig $rectorConfig): void {
         $parsedConstraints = $versionParser->parseConstraints($phpConstraint);
 
         $setList = match (true) {
-            $parsedConstraints->matches($versionParser->parseConstraints('7.1.*')) => [LevelSetList::UP_TO_PHP_71],
-            $parsedConstraints->matches($versionParser->parseConstraints('7.2.*')) => [LevelSetList::UP_TO_PHP_72],
-            $parsedConstraints->matches($versionParser->parseConstraints('7.3.*')) => [LevelSetList::UP_TO_PHP_73],
-            $parsedConstraints->matches($versionParser->parseConstraints('7.4.*')) => [LevelSetList::UP_TO_PHP_74],
-            $parsedConstraints->matches($versionParser->parseConstraints('8.0.*')) => [LevelSetList::UP_TO_PHP_80],
-            $parsedConstraints->matches($versionParser->parseConstraints('8.1.*')) => [
+            $parsedConstraints->matches($versionParser->parseConstraints('< 7.1')) => [],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 7.2')) => [LevelSetList::UP_TO_PHP_71],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 7.3')) => [LevelSetList::UP_TO_PHP_72],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 7.4')) => [LevelSetList::UP_TO_PHP_73],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 8.0')) => [LevelSetList::UP_TO_PHP_74],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 8.1')) => [LevelSetList::UP_TO_PHP_80],
+            $parsedConstraints->matches($versionParser->parseConstraints('^8.1')) => [
                 LevelSetList::UP_TO_PHP_81,
                 ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES,
                 DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
