@@ -29,7 +29,7 @@ class Deployer
     private bool $clearOpcache = false;
     private bool $hasHtaccess = false;
     private bool $installContaoManager = true;
-    private bool $lockContaoManager = true;
+    private bool $lockContaoManager = false;
     private bool $lockInstallTool = true;
     private bool $useMaintenanceMode = true;
     private bool $migrateDatabase = true;
