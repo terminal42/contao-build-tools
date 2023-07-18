@@ -199,8 +199,15 @@ class Deployer
         set('default_timeout', $this->timeout);
         set('allow_anonymous_stats', false);
 
-        add('shared_dirs', $this->getSharedDirs());
-        add('shared_files', $this->getSharedFiles());
+        set('shared_dirs', $this->getSharedDirs());
+        set('shared_files', $this->getSharedFiles());
+
+        set('writable_dirs', [
+            'var',
+            'var/cache',
+            'var/logs',
+            'system/tmp'
+        ]);
 
         task('deploy:upload', $this->uploadClosure());
         task('deploy', $this->deployBody());
@@ -340,15 +347,14 @@ class Deployer
         $sharedDirs[] = 'assets/images'; // image thumbnails
         $sharedDirs[] = 'files'; // file uploads
         $sharedDirs[] = '{{public_path}}/share'; // share directory for news sitemaps
-        $sharedDirs[] = 'var/backups'; // backup directory
-        $sharedDirs[] = 'var/logs'; // log directory
+        $sharedDirs[] = 'system/config'; // old config files like localconfig.php, dcaconfig.php etc.
         $sharedDirs[] = 'system/tmp'; // some extensions and even the core still upload to system/tmp
+        $sharedDirs[] = 'var/backups'; // contao:database:backup directory
+        $sharedDirs[] = 'var/logs'; // logs directory
 
         // Add or remove contao-manager directory
         if ($this->installContaoManager) {
             $sharedDirs[] = 'contao-manager';
-        } else {
-            $sharedDirs = array_diff($sharedDirs, ['contao-manager']);
         }
 
         $composerConfig = json_decode(file_get_contents('./composer.json'), true, 512, JSON_THROW_ON_ERROR);
@@ -377,8 +383,11 @@ class Deployer
     {
         $sharedFiles = $this->sharedFiles;
 
-        // If a composer auth is required, and it exists locally, we can assume it also needs to exist on the server
-        // as a shared file
+        $sharedFiles[] = 'config/parameters.yml';
+        $sharedFiles[] = '.env.local';
+
+        // If a composer auth is required, and it exists locally,
+        // we can assume it also needs to exist on the server as a shared file
         if (file_exists('auth.json')) {
             $sharedFiles[] = 'auth.json';
         }
