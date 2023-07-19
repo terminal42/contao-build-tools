@@ -44,6 +44,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         );
 
         $this->registerConfigScript(
+            'check-cs', // do not use e.g. "cs-checker" because it would disallow a "composer cs" shortcut ;-)
+            'Checks code style on the project files [terminal42/contao-build-tools].',
+            '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --ansi',
+            [
+                'default' => ['./src', './tests'],
+                'contao' => ['./contao'],
+                'template' => ['./templates', './contao/templates'],
+            ],
+            $scripts,
+        );
+
+        $this->registerConfigScript(
             'rector',
             'Run Rector on the project files [terminal42/contao-build-tools].',
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
