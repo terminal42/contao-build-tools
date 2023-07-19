@@ -367,7 +367,10 @@ class Deployer
             $sharedDirs[] = 'assets/avatars';
         }
 
-        if (InstalledVersions::satisfies(new VersionParser(), 'terminal42/notification_center', '^2.0')) {
+        if (
+            InstalledVersions::isInstalled('terminal42/notification_center')
+            && InstalledVersions::satisfies(new VersionParser(), 'terminal42/notification_center', '^2.0')
+        ) {
             $sharedDirs[] = 'var/nc_bulky_items';
         }
 
