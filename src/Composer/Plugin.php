@@ -18,14 +18,21 @@ use Composer\Script\ScriptEvents;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
+    private Filesystem $filesystem;
     public array $activatedScripts = [];
+
+    public function __construct()
+    {
+        $this->filesystem = new Filesystem();
+    }
 
     public function activate(Composer $composer, IOInterface $io): void
     {
-        if (!file_exists(getcwd().'/src')) {
+        if (!$this->filesystem->exists(getcwd().'/src')) {
             return;
         }
 
@@ -144,15 +151,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
     private function executeInNamespace(Application $application, $namespace, InputInterface $input, OutputInterface $output): int
     {
-        if (!file_exists($namespace) && !mkdir($namespace, 0777, true) && !is_dir($namespace)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $namespace));
+        if (!$this->filesystem->exists($namespace)) {
+            $this->filesystem->mkdir($namespace);
         }
 
         chdir($namespace);
 
         // some plugins require access to composer file e.g. Symfony Flex
-        if (!file_exists(Factory::getComposerFile())) {
-            file_put_contents(Factory::getComposerFile(), '{}');
+        if (!$this->filesystem->exists(Factory::getComposerFile())) {
+            $this->filesystem->dumpFile(Factory::getComposerFile(), '{}');
         }
 
         $input = new StringInput((string) $input . ' --quiet --working-dir=.');

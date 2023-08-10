@@ -7,7 +7,8 @@ namespace Terminal42\ContaoBuildTools;
 use Composer\InstalledVersions;
 use Composer\Semver\VersionParser;
 use Deployer\Host\Host;
-use function Deployer\add;
+
+use Symfony\Component\Filesystem\Filesystem;
 use function Deployer\currentHost;
 use function Deployer\error;
 use function Deployer\get;
@@ -238,7 +239,7 @@ class Deployer
         ];
 
         foreach ($paths as $k => $v) {
-            if (!file_exists($v)) {
+            if (!(new Filesystem())->exists($v)) {
                 unset ($paths[$k]);
             }
         }
@@ -391,7 +392,7 @@ class Deployer
 
         // If a composer auth is required, and it exists locally,
         // we can assume it also needs to exist on the server as a shared file
-        if (file_exists('auth.json')) {
+        if ((new Filesystem())->exists('auth.json')) {
             $sharedFiles[] = 'auth.json';
         }
 
