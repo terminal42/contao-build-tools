@@ -65,6 +65,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $scripts
         );
 
+        $this->registerConfigScript(
+            'phpstan',
+            'Run PHPStan on the project files [terminal42/contao-build-tools].',
+            '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=%s.neon',
+            [
+                'default' => ['./src', './tests']
+            ],
+            $scripts
+        );
+
         $composer->getPackage()->setScripts($scripts);
     }
 

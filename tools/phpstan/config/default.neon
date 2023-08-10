@@ -1,0 +1,28 @@
+includes:
+    - ../vendor/phpstan/phpstan-phpunit/extension.neon
+    - ../vendor/phpstan/phpstan-phpunit/rules.neon
+    - ../vendor/phpstan/phpstan-symfony/extension.neon
+    - ../vendor/phpstan/phpstan-symfony/rules.neon
+    - ../vendor/slam/phpstan-extensions/conf/symfony-rules.neon
+
+rules:
+    - TheCodingMachine\PHPStan\Rules\Exceptions\DoNotThrowExceptionBaseClassRule
+    - TheCodingMachine\PHPStan\Rules\Exceptions\ThrowMustBundlePreviousExceptionRule
+
+parameters:
+    dynamicConstantNames:
+        - BE_USER_LOGGED_IN
+
+    universalObjectCratesClasses:
+        - Contao\Model
+        - Contao\Template
+
+#    excludePaths:
+#        - %currentWorkingDirectory%/core-bundle/src/Resources/*
+#        - %currentWorkingDirectory%/core-bundle/tests/Fixtures/*
+#        - %currentWorkingDirectory%/core-bundle/tests/Functional/app/*
+#        - %currentWorkingDirectory%/core-bundle/tests/Functional/var/*
+
+    treatPhpDocTypesAsCertain: false
+    checkMissingIterableValueType: false
+    rememberPossiblyImpureFunctionValues: false
