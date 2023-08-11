@@ -24,14 +24,33 @@ through the `composer run` command:
 The `cs-fixer` script will fix the coding style in the `src/` directory according to the 
 latest Contao coding standards.
 
+You can also run `check-cs` to only run a code style check without applying fixes (e.g. for build tools).
+
 ### Rector
 
-The `rector` script will automatically upgrades the code to match the latest Contao standards.
+The `rector` script will automatically upgrade the code to match the latest Contao standards.
+
+### PHPStan
+
+The `phpstan` script will check your code with PHPStan.
+
+By default, the config uses *PHPStan Level 6* to validate your code. There are two ways to adjust this
+1. Call the command with a level parameter, e.g. `composer phpstan -- --level=4`
+2. Configure the PHPStan level in your composer.json extra section
+   ```json
+   {
+        "extra": {
+            "contao-build-tools": {
+                "phpstan-level": "4"
+            }  
+        }
+   }
+   ```
+
 
 ### Ideas
 
 Ideas for additional tools that could be integrated:
- - phpstan
  - maglnet/composer-require-checker
  - https://github.com/VincentLanglet/Twig-CS-Fixer
 

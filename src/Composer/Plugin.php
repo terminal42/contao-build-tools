@@ -36,7 +36,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             return;
         }
 
-        $scripts = $composer->getPackage()->getScripts();
+        $rootPackage = $composer->getPackage();
+        $scripts = $rootPackage->getScripts();
 
         $this->registerConfigScript(
             'cs-fixer',
@@ -72,12 +73,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $scripts
         );
 
+        $level = $rootPackage->getExtra()['contao-build-tools']['phpstan-level'] ?? null;
         $this->registerConfigScript(
             'phpstan',
             'Run PHPStan on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=%s.neon',
+            '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.neon'.($level ? ' --level='.$level : ''),
             [
-                'default' => ['./src', './tests']
+                'config' => ['./src', './tests']
             ],
             $scripts
         );
