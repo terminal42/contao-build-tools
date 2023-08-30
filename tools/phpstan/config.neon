@@ -3,6 +3,8 @@ includes:
     - vendor/phpstan/phpstan-phpunit/rules.neon
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-symfony/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
     - vendor/slam/phpstan-extensions/conf/symfony-rules.neon
 
 rules:
@@ -22,3 +24,6 @@ parameters:
     treatPhpDocTypesAsCertain: false
     checkMissingIterableValueType: false
     rememberPossiblyImpureFunctionValues: false
+
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
