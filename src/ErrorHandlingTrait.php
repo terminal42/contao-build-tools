@@ -14,7 +14,7 @@ trait ErrorHandlingTrait
 {
     private string|null $sentryCheckInId = null;
 
-    private function sentryOrThrow(string $message, \Exception $exception = null, array $contexts = []): void
+    private function sentryOrThrow(string $message, \Throwable $exception = null, array $contexts = []): void
     {
         $event = Event::createEvent();
         $event->setMessage($message);
