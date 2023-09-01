@@ -13,6 +13,7 @@ use function Deployer\currentHost;
 use function Deployer\error;
 use function Deployer\get;
 use function Deployer\host;
+use function Deployer\run;
 use function Deployer\runLocally;
 use function Deployer\set;
 use function Deployer\task;
@@ -203,6 +204,19 @@ class Deployer
         set('shared_dirs', $this->getSharedDirs());
         set('shared_files', $this->getSharedFiles());
 
+        set('bin/composer', function () {
+            if (test('[ -f {{deploy_path}}/.dep/composer.phar ]')) {
+                run('{{bin/php}} {{deploy_path}}/.dep/composer.phar self-update');
+
+                return '{{bin/php}} {{deploy_path}}/.dep/composer.phar';
+            }
+
+            run("cd {{deploy_path}} && curl -sS https://getcomposer.org/installer | {{bin/php}}");
+            run('mv {{deploy_path}}/composer.phar {{deploy_path}}/.dep/composer.phar');
+
+            return '{{bin/php}} {{deploy_path}}/.dep/composer.phar';
+        });
+
         set('writable_dirs', [
             'var',
             'var/cache',
@@ -291,7 +305,6 @@ class Deployer
         $body[] = 'deploy:release';
         $body[] = 'deploy:shared';
         $body[] = 'deploy:upload';
-        $body[] = 'deploy:composer-self-update';
         $body[] = 'deploy:vendors';
         $body[] = 'deploy:htaccess';
 
