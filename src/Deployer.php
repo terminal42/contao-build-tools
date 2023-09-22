@@ -24,6 +24,7 @@ use function Deployer\warning;
 class Deployer
 {
     // Deployer setup
+    private ?string $composerPath = null;
     private bool $lockDeployment = true;
     private int $timeout = 300;
     private int $keepReleases = 10;
@@ -158,6 +159,18 @@ class Deployer
         return $this->reset();
     }
 
+    public function getComposerPath(): ?string
+    {
+        return $this->composerPath;
+    }
+
+    public function setComposerPath(?string $composerPath): self
+    {
+        $this->composerPath = $composerPath;
+
+        return $this->reset();
+    }
+
     public function lockDeployment(bool $lock = true): self
     {
         $this->lockDeployment = $lock;
@@ -206,6 +219,10 @@ class Deployer
         set('shared_files', $this->getSharedFiles());
 
         set('bin/composer', function () {
+            if ($path = $this->getComposerPath()) {
+                return $path;
+            }
+
             if (test('[ -f {{deploy_path}}/.dep/composer.phar ]')) {
                 run('{{bin/php}} {{deploy_path}}/.dep/composer.phar self-update');
 
