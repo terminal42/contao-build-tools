@@ -34,4 +34,8 @@ return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->lineEnding("\n");
 
     $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_default_cache');
+
+    if (file_exists(getcwd().'/ecs.php')) {
+        $ecsConfig->import(getcwd().'/ecs.php');
+    }
 };

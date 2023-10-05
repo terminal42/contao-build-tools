@@ -34,4 +34,8 @@ return static function (ECSConfig $ecsConfig): void {
 
     $ecsConfig->fileExtensions(['html5']);
     $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_template_cache');
+
+    if (file_exists(getcwd().'/ecs.php')) {
+        $ecsConfig->import(getcwd().'/ecs.php');
+    }
 };

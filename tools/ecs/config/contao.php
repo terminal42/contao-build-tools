@@ -14,4 +14,8 @@ return static function (ECSConfig $ecsConfig): void {
     ]);
 
     $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_contao_cache');
+
+    if (file_exists(getcwd().'/ecs.php')) {
+        $ecsConfig->import(getcwd().'/ecs.php');
+    }
 };
