@@ -18,8 +18,12 @@ parameters:
         - BE_USER_LOGGED_IN
 
     universalObjectCratesClasses:
+        - Contao\ContentElement
+        - Contao\Database\Result
         - Contao\Model
+        - Contao\Module
         - Contao\Template
+        - Contao\User
 
     treatPhpDocTypesAsCertain: false
     checkMissingIterableValueType: false
