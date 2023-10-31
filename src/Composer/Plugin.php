@@ -22,6 +22,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
+    private const CI_SCRIPT = 'build-tools';
+
     private Filesystem $filesystem;
     public array $activatedScripts = [];
 
@@ -43,18 +45,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'cs-fixer',
             'Run code style fixes on the project files [terminal42/contao-build-tools].',
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
-            [
-                'default' => ['./src', './tests'],
-                'contao' => ['./contao'],
-                'template' => ['./templates', './contao/templates'],
-            ],
-            $scripts,
-        );
-
-        $this->registerConfigScript(
-            'check-cs', // do not use e.g. "cs-checker" because it would disallow a "composer cs" shortcut ;-)
-            'Checks code style on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --ansi',
+            '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
             [
                 'default' => ['./src', './tests'],
                 'contao' => ['./contao'],
@@ -67,6 +58,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'rector',
             'Run Rector on the project files [terminal42/contao-build-tools].',
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
+            '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
                 'config' => ['./src', './tests', './contao', './templates']
             ],
@@ -77,6 +69,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'phpstan',
             'Run PHPStan on the project files [terminal42/contao-build-tools].',
+            '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.neon'.($level ? ' --level='.$level : ''),
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.neon'.($level ? ' --level='.$level : ''),
             [
                 'config' => ['./src', './tests']
@@ -181,12 +174,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript(string $name, string $description, string $command, array $configs, array &$scripts): void
+    private function registerConfigScript(string $name, string $description, string $command, string $ciCommand, array $configs, array &$scripts): void
     {
-        if (\array_keys($scripts, $name)) {
-            return;
-        }
-
         foreach ($configs as $config => $paths) {
             foreach ($paths as $k => $path) {
                 if (!is_dir($path)) {
@@ -207,10 +196,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 implode(' ', $paths),
                 $config
             );
+
+            if (!isset($scripts[self::CI_SCRIPT])) {
+                $scripts[self::CI_SCRIPT] = [];
+            }
+
+            $scripts[self::CI_SCRIPT][] = sprintf(
+                $ciCommand,
+                implode(' ', $paths),
+                $config
+            );
         }
 
         if (!empty($scripts[$name])) {
             $this->activatedScripts[$name] = $description;
+            $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
         }
     }
 }
