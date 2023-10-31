@@ -69,6 +69,8 @@ return static function (RectorConfig $rectorConfig): void {
         ContainerGetToConstructorInjectionRector::class => [
             '*/Model/',
             '*/FormField/',
+            '*/FrontendModule/',
+            '*/ContentElement/',
         ],
     ]);
 
