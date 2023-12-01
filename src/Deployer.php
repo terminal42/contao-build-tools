@@ -419,8 +419,13 @@ class Deployer
 
         // Upload all system/modules that are not .gitignore'd
         $gitignore = file('.gitignore') ?: [];
+        $unignore = \in_array('/system/modules/*', $gitignore, true);
         foreach (scandir('system/modules') as $folder) {
-            if ('.' === $folder || '..' === $folder || \in_array('/system/modules/'.$folder, $gitignore, true)) {
+            if (
+                '.' === $folder
+                || '..' === $folder
+                || \in_array(($unignore ? '!' : '').'/system/modules/'.$folder, $gitignore, true) !== $unignore
+            ) {
                 continue;
             }
 
