@@ -23,6 +23,11 @@ use function Deployer\warning;
 
 class Deployer
 {
+    public const MAINTENANCE_NONE = 0;
+    public const MAINTENANCE_ENABLE = 1;
+    public const MAINTENANCE_DISABLE = 2;
+    public const MAINTENANCE_BOTH = 3;
+
     // Deployer setup
     private bool $lockDeployment = true;
     private int $timeout = 300;
@@ -33,7 +38,7 @@ class Deployer
     private bool $installContaoManager = true;
     private bool $lockContaoManager = false;
     private bool $lockInstallTool = true;
-    private bool $useMaintenanceMode = true;
+    private int $useMaintenanceMode = self::MAINTENANCE_BOTH;
     private bool $migrateDatabase = true;
     private bool $migrateDatabaseWithDeletes = false;
     private string|null $buildAssets = null;
@@ -165,9 +170,13 @@ class Deployer
         return $this->reset();
     }
 
-    public function useMaintenanceMode(bool $maintenanceMode = true): self
+    public function useMaintenanceMode(bool|int $maintenanceMode = true): self
     {
-        $this->useMaintenanceMode = $maintenanceMode;
+        if (is_bool($maintenanceMode)) {
+            $this->useMaintenanceMode = $maintenanceMode ? self::MAINTENANCE_BOTH : self::MAINTENANCE_NONE;
+        } else {
+            $this->useMaintenanceMode = $maintenanceMode;
+        }
 
         return $this->reset();
     }
@@ -321,7 +330,7 @@ class Deployer
             $body[] = 'contao:install:lock';
         }
 
-        if ($this->useMaintenanceMode) {
+        if ($this->useMaintenanceMode & self::MAINTENANCE_ENABLE) {
             $body[] = 'contao:maintenance:enable';
         }
 
@@ -340,7 +349,7 @@ class Deployer
             }
         }
 
-        if ($this->useMaintenanceMode) {
+        if ($this->useMaintenanceMode & self::MAINTENANCE_DISABLE) {
             $body[] = 'contao:maintenance:disable';
         }
 
