@@ -7,6 +7,7 @@ use Contao\Rector\Set\ContaoLevelSetList;
 use Contao\Rector\Set\ContaoSetList;
 use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
+use Rector\Php71\Rector\FuncCall\CountOnNullRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
@@ -60,6 +61,9 @@ return static function (RectorConfig $rectorConfig): void {
     }
 
     $rectorConfig->skip([
+        CountOnNullRector::class => [
+            '*.html5'
+        ],
         ClassPropertyAssignToConstructorPromotionRector::class => [
             '*/Entity/'
         ],
