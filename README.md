@@ -22,9 +22,8 @@ through the `composer run` command:
 ### Code Style Fixer
 
 The `cs-fixer` script will fix the coding style in the `src/` directory according to the 
-latest Contao coding standards.
-
-You can also run `check-cs` to only run a code style check without applying fixes (e.g. for build tools).
+latest Contao coding standards. Create an `ecs.php` script in your project
+to extend the default configuration.
 
 ### Rector
 
@@ -33,19 +32,7 @@ The `rector` script will automatically upgrade the code to match the latest Cont
 ### PHPStan
 
 The `phpstan` script will check your code with PHPStan.
-
-By default, the config uses *PHPStan Level 6* to validate your code. There are two ways to adjust this
-1. Call the command with a level parameter, e.g. `composer phpstan -- --level=4`
-2. Configure the PHPStan level in your composer.json extra section
-   ```json
-   {
-        "extra": {
-            "contao-build-tools": {
-                "phpstan-level": "4"
-            }  
-        }
-   }
-   ```
+Create a `phpstan.neon` file in your project to extend the default configuration. 
 
 
 ### Ideas
@@ -53,6 +40,50 @@ By default, the config uses *PHPStan Level 6* to validate your code. There are t
 Ideas for additional tools that could be integrated:
  - maglnet/composer-require-checker
  - https://github.com/VincentLanglet/Twig-CS-Fixer
+
+
+## Continuous Integration
+
+To make sure your code is always up-to-date, you might want
+to run all build tools at once but only verify and not fix files.
+Run `composer run build-tools` to do this.
+
+### Example GitHub Action
+
+```yaml
+# /.github/workflows/ci.yml
+name: CI
+
+on:
+    push: ~
+    pull_request: ~
+
+permissions: read-all
+
+jobs:
+    ecs:
+        name: build-tools
+        runs-on: ubuntu-latest
+        steps:
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.1
+                  extensions: dom, fileinfo, filter, gd, hash, intl, json, mbstring, mysqli, pcre, pdo_mysql, zlib
+                  coverage: none
+
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Install the dependencies
+              run: |
+                  composer install --no-interaction --no-progress
+
+            - name: Run all build-tools to validate code
+              run: composer run build-tools
+
+```
+
 
 
 ## Deploying Contao websites
