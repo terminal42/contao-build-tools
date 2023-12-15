@@ -7,10 +7,9 @@ use Contao\Rector\Set\ContaoLevelSetList;
 use Contao\Rector\Set\ContaoSetList;
 use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
-use Rector\Php71\Rector\FuncCall\CountOnNullRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\LevelSetList;
-use Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
+use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -60,10 +59,9 @@ return static function (RectorConfig $rectorConfig): void {
         }
     }
 
+    $rectorConfig->symfonyContainerPhp(__DIR__ . '/tests/symfony-container.php');
+
     $rectorConfig->skip([
-        CountOnNullRector::class => [
-            '*.html5'
-        ],
         ClassPropertyAssignToConstructorPromotionRector::class => [
             '*/Entity/'
         ],
@@ -95,4 +93,8 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->fileExtensions(['php', 'html5']);
     $rectorConfig->parallel();
+
+    if (file_exists(getcwd().'/rector.php')) {
+        $rectorConfig->import(getcwd().'/rector.php');
+    }
 };
