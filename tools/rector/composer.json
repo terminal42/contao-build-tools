@@ -1,6 +1,6 @@
 {
     "require": {
-        "rector/rector": "^0.18",
+        "rector/rector": "^0.19",
         "contao/contao-rector": "dev-main"
     }
 }
