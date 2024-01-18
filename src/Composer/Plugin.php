@@ -207,8 +207,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $result = [];
 
         foreach ($paths as $path) {
-            if (self::LEGACY_MODULES === $path) {
+            if (!is_dir($path)) {
+                continue;
+            }
 
+            if (self::LEGACY_MODULES === $path) {
                 foreach(scandir(self::LEGACY_MODULES) as $dir) {
                     if ('.' === $dir || '..' === $dir) {
                         continue;
@@ -222,9 +225,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 continue;
             }
 
-            if (is_dir($path)) {
-                $result[] = $path;
-            }
+            $result[] = $path;
         }
 
         return $result;
