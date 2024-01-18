@@ -23,6 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     private const CI_SCRIPT = 'build-tools';
+    private const LEGACY_MODULES = './system/modules';
 
     private Filesystem $filesystem;
     public array $activatedScripts = [];
@@ -48,7 +49,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
             [
                 'default' => ['./src', './tests'],
-                'contao' => ['./contao'],
+                'contao' => ['./contao', self::LEGACY_MODULES],
                 'template' => ['./templates', './contao/templates'],
             ],
             $scripts,
@@ -60,7 +61,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
-                'config' => ['./src', './tests', './contao', './templates']
+                'config' => ['./src', './tests', './contao', './templates', self::LEGACY_MODULES]
             ],
             $scripts
         );
@@ -71,7 +72,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
             [
-                'config' => ['./src', './tests']
+                'config' => ['./src', './tests', self::LEGACY_MODULES]
             ],
             $scripts
         );
@@ -176,34 +177,22 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     private function registerConfigScript(string $name, string $description, string $command, string $ciCommand, array $configs, array &$scripts): void
     {
         foreach ($configs as $config => $paths) {
-            foreach ($paths as $k => $path) {
-                if (!is_dir($path)) {
-                    unset($paths[$k]);
-                }
-            }
+            $paths = $this->filterPaths($paths);
 
             if (empty($paths)) {
                 continue;
             }
 
-            if (!isset($scripts[$name])) {
-                $scripts[$name] = [];
-            }
-
-            $scripts[$name][] = sprintf(
-                $command,
-                implode(' ', $paths),
-                $config
+            $this->addScript(
+                sprintf($command, implode(' ', $paths), $config),
+                $name,
+                $scripts
             );
 
-            if (!isset($scripts[self::CI_SCRIPT])) {
-                $scripts[self::CI_SCRIPT] = [];
-            }
-
-            $scripts[self::CI_SCRIPT][] = sprintf(
-                $ciCommand,
-                implode(' ', $paths),
-                $config
+            $this->addScript(
+                sprintf($ciCommand, implode(' ', $paths), $config),
+                self::CI_SCRIPT,
+                $scripts
             );
         }
 
@@ -211,5 +200,42 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $this->activatedScripts[$name] = $description;
             $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
         }
+    }
+
+    private function filterPaths(array $paths): array
+    {
+        $result = [];
+
+        foreach ($paths as $path) {
+            if (self::LEGACY_MODULES === $path) {
+
+                foreach(scandir(self::LEGACY_MODULES) as $dir) {
+                    if ('.' === $dir || '..' === $dir) {
+                        continue;
+                    }
+
+                    if (is_dir(self::LEGACY_MODULES.'/'.$dir) && !is_link(self::LEGACY_MODULES.'/'.$dir)) {
+                        $result[] = self::LEGACY_MODULES.'/'.$dir;
+                    }
+                }
+
+                continue;
+            }
+
+            if (is_dir($path)) {
+                $result[] = $path;
+            }
+        }
+
+        return $result;
+    }
+
+    private function addScript(string $command, string $name, array &$scripts): void
+    {
+        if (!isset($scripts[$name])) {
+            $scripts[$name] = [];
+        }
+
+        $scripts[$name][] = $command;
     }
 }
