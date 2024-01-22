@@ -11,6 +11,7 @@ use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
 use Rector\Set\ValueObject\LevelSetList;
+use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
@@ -60,6 +61,18 @@ return static function (RectorConfig $rectorConfig): void {
             $rectorConfig->sets($setList);
         }
     }
+
+    // https://getrector.com/blog/5-common-mistakes-in-rector-config-and-how-to-avoid-them
+    $rectorConfig->sets([
+        SetList::DEAD_CODE,
+        //SetList::CODE_QUALITY,
+        //SetList::CODING_STYLE,
+        //SetList::NAMING,
+        //SetList::TYPE_DECLARATION,
+        //SetList::PRIVATIZATION,
+        //SetList::EARLY_RETURN,
+        //SetList::INSTANCEOF,
+    ]);
 
     $rectorConfig->symfonyContainerPhp(__DIR__ . '/tests/symfony-container.php');
 
