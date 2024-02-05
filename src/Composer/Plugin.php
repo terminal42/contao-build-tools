@@ -35,10 +35,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
     public function activate(Composer $composer, IOInterface $io): void
     {
-        if (!$this->filesystem->exists(getcwd().'/src')) {
-            return;
-        }
-
         $rootPackage = $composer->getPackage();
         $scripts = $rootPackage->getScripts();
 
