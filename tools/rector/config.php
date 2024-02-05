@@ -102,21 +102,6 @@ return static function (RectorConfig $rectorConfig): void {
         ],
     ]);
 
-    if (file_exists(getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php')) {
-        require_once getcwd().'/vendor/contao/core-bundle/src/Resources/contao/config/constants.php';
-    }
-
-    if (!\defined('TL_MODE')) {
-        \define('TL_MODE', 'FE');
-        \define('TL_START', microtime(true));
-        \define('TL_ROOT', getcwd());
-        \define('TL_REFERER_ID', '');
-        \define('TL_SCRIPT', 'index.php');
-        \define('BE_USER_LOGGED_IN', false);
-        \define('FE_USER_LOGGED_IN', false);
-        \define('TL_PATH', '/');
-    }
-
     $rectorConfig->fileExtensions(['php', 'html5']);
     $rectorConfig->parallel();
 
