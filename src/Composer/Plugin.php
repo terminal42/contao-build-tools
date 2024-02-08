@@ -44,7 +44,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
             [
-                'default' => ['./src', './tests'],
+                'default' => ['./config', './src', './tests'],
                 'contao' => ['./contao', self::LEGACY_MODULES],
                 'template' => ['./templates', './contao/templates'],
             ],
@@ -57,7 +57,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
-                'config' => ['./src', './tests', './contao', './templates', self::LEGACY_MODULES]
+                'config' => ['./config', './src', './tests', './contao', './templates', self::LEGACY_MODULES]
             ],
             $scripts
         );
