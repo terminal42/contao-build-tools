@@ -44,7 +44,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
             [
-                'default' => ['./config', './src', './tests'],
+                'default' => ['./src', './tests', './config'],
                 'contao' => ['./contao', self::LEGACY_MODULES],
                 'template' => ['./templates', './contao/templates'],
             ],
@@ -57,7 +57,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
-                'config' => ['./config', './src', './tests', './contao', './templates', self::LEGACY_MODULES]
+                'config' => ['./src', './tests', './config', './contao', './templates', self::LEGACY_MODULES]
             ],
             $scripts
         );
@@ -68,7 +68,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
             [
-                'config' => ['./src', './tests', self::LEGACY_MODULES]
+                'config' => ['./src', './tests', './config', self::LEGACY_MODULES]
             ],
             $scripts
         );
