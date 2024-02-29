@@ -38,6 +38,7 @@ class Deployer
     private bool $installContaoManager = true;
     private bool $lockContaoManager = false;
     private bool $lockInstallTool = true;
+    private bool $dumpEnvLocal = true;
     private int $useMaintenanceMode = self::MAINTENANCE_BOTH;
     private bool $migrateDatabase = true;
     private bool $migrateDatabaseWithDeletes = false;
@@ -151,6 +152,13 @@ class Deployer
     public function lockInstallTool(bool $lock = true): self
     {
         $this->lockInstallTool = $lock;
+
+        return $this->reset();
+    }
+
+    public function dumpEnvLocal(bool $dumpEnvLocal = true): self
+    {
+        $this->dumpEnvLocal = $dumpEnvLocal;
 
         return $this->reset();
     }
@@ -317,6 +325,17 @@ class Deployer
         $body[] = 'deploy:upload';
         $body[] = 'deploy:vendors';
         $body[] = 'deploy:htaccess';
+
+        if ($this->dumpEnvLocal) {
+            task('deploy:dump-env-local', function () {
+                if (!str_contains(run('{{bin/console}} list {{console_options}}'), 'dotenv:dump')) {
+                    warning('Cannot dump .env.local.php, dotenv:dump command is not registered - skipping');
+                } else {
+                    run('{{bin/console}} dotenv:dump {{console_options}}');
+                }
+            });
+            $body[] = 'deploy:dump-env-local';
+        }
 
         if ($this->installContaoManager) {
             $body[] = 'contao:manager:download';
