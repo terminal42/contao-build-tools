@@ -40,7 +40,7 @@ return static function (RectorConfig $rectorConfig): void {
         }
     }
 
-    if ($phpConstraint = $composerJson['require']['php'] ?? null) {
+    if ($phpConstraint = $composerJson['config']['platform']['php'] ?? $composerJson['require']['php'] ?? null) {
         $parsedConstraints = $versionParser->parseConstraints($phpConstraint);
 
         $setList = match (true) {

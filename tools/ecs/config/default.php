@@ -20,7 +20,7 @@ return static function (ECSConfig $ecsConfig): void {
         $versionParser = new VersionParser();
         $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        if ($phpConstraint = $composerJson['require']['php'] ?? null) {
+        if ($phpConstraint = $composerJson['config']['platform']['php'] ?? $composerJson['require']['php'] ?? null) {
             $parsedConstraints = $versionParser->parseConstraints($phpConstraint);
 
             if ($parsedConstraints->matches($versionParser->parseConstraints('< 8'))) {
