@@ -1,0 +1,29 @@
+name: terminal42 Build Tools (Validation)
+
+on:
+    workflow_call: ~
+
+permissions: read-all
+
+jobs:
+    build_tools:
+        name: build-tools
+        runs-on: ubuntu-latest
+        steps:
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.2
+                  extensions: dom, fileinfo, filter, gd, hash, intl, json, mbstring, mysqli, pcre, pdo_mysql, zlib
+                  coverage: none
+
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  show-progress: false
+
+            - name: Install the dependencies
+              uses: ramsey/composer-install@v3
+
+            - name: Run all build-tools to validate code
+              run: composer run build-tools
