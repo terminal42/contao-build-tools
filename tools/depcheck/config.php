@@ -34,6 +34,7 @@ if (empty($config->getPathsToScan())) {
 $config
     ->ignoreUnknownClasses([
         'Gmagick',
+        'Imagick',
         'Swift_Attachment',
         'Swift_EmbeddedFile',
         'Swift_Mailer',
