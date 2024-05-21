@@ -66,6 +66,13 @@ $config
     // The manager plugin is a dev dependency because it is only required in the
     // managed edition.
     ->ignoreErrorsOnPackage('contao/manager-plugin', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+
+    // Contao bundles can be dev-requirements to only add features if they are installed
+    ->ignoreErrorsOnPackage('contao/calendar-bundle', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    ->ignoreErrorsOnPackage('contao/comments-bundle', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    ->ignoreErrorsOnPackage('contao/faq-bundle', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    ->ignoreErrorsOnPackage('contao/news-bundle', [ErrorType::DEV_DEPENDENCY_IN_PROD])
+    ->ignoreErrorsOnPackage('contao/newsletter-bundle', [ErrorType::DEV_DEPENDENCY_IN_PROD])
 ;
 
 return $config;
