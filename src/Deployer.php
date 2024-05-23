@@ -321,8 +321,8 @@ class Deployer
         }
 
         $body[] = 'deploy:release';
-        $body[] = 'deploy:shared';
         $body[] = 'deploy:upload';
+        $body[] = 'deploy:shared';
         $body[] = 'deploy:vendors';
         $body[] = 'deploy:htaccess';
 
