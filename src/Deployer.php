@@ -429,7 +429,7 @@ class Deployer
     {
         $sharedFiles = $this->sharedFiles;
 
-        foreach (['yaml', 'php', 'xml', 'php'] as $ext) {
+        foreach (['yaml', 'php', 'xml', 'yml'] as $ext) {
             if ((new Filesystem())->exists('config/parameters.'.$ext)) {
                 $sharedFiles[] = 'config/parameters.'.$ext;
                 break;
