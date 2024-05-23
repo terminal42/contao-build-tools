@@ -429,7 +429,13 @@ class Deployer
     {
         $sharedFiles = $this->sharedFiles;
 
-        $sharedFiles[] = 'config/parameters.yml';
+        foreach (['yaml', 'php', 'xml', 'php'] as $ext) {
+            if ((new Filesystem())->exists('config/parameters.'.$ext)) {
+                $sharedFiles[] = 'config/parameters.'.$ext;
+                break;
+            }
+        }
+
         $sharedFiles[] = '.env.local';
 
         // If a composer auth is required, and it exists locally,
