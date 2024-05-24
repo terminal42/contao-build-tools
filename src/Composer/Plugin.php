@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
@@ -35,8 +36,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
     public function activate(Composer $composer, IOInterface $io): void
     {
-        $rootPackage = $composer->getPackage();
-        $scripts = $rootPackage->getScripts();
+        $scripts = [];
 
         $this->registerConfigScript(
             'cs-fixer',
@@ -66,7 +66,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'phpstan',
             'Run PHPStan on the project files [terminal42/contao-build-tools].',
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
-            '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
+            null,
             [
                 'config' => ['./src', './tests', './config', self::LEGACY_MODULES]
             ],
@@ -77,14 +77,32 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'depcheck',
             'Run Dependency Analyzer on the project files [terminal42/contao-build-tools].',
             '@php vendor/terminal42/contao-build-tools/tools/depcheck/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/terminal42/contao-build-tools/tools/depcheck/%s.php',
-            '@php vendor/terminal42/contao-build-tools/tools/depcheck/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/terminal42/contao-build-tools/tools/depcheck/%s.php',
+            null,
             [
                 'config' => ['./composer.json'],
             ],
             $scripts
         );
 
-        $composer->getPackage()->setScripts($scripts);
+        $this->registerConfigScript(
+            'stylelint',
+            'Run stylelint on the project files [terminal42/contao-build-tools].',
+            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --fix',
+            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s',
+            [
+                'stylelint.config.js' => ['./layout/**/*.s?(a|c)ss'],
+            ],
+            $scripts,
+            false
+        );
+
+        $rootPackage = $composer->getPackage();
+        $rootPackage->setScripts(
+            array_merge(
+                array_diff_key($scripts, $rootPackage->getScripts()),
+                $rootPackage->getScripts()
+            )
+        );
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
@@ -144,6 +162,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $originalWorkingDir = getcwd();
         foreach ($binRoots as $binRoot) {
+            if ($this->filesystem->exists($binRoot.'/package.json')) {
+                $output = Process::fromShellCommandline('yarn')
+                    ->setInput('install')
+                    ->setWorkingDirectory($binRoot)
+                    ->mustRun()
+                    ->getOutput();
+
+                $io->write($output);
+
+                continue;
+            }
+
             $this->executeInNamespace($application, $binRoot, $input, $output);
 
             chdir($originalWorkingDir);
@@ -181,23 +211,25 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript(string $name, string $description, string $command, string $ciCommand, array $configs, array &$scripts): void
+    private function registerConfigScript(string $name, string $description, string $command, string|null $ciCommand, array $configs, array &$scripts, bool $validatePaths = true): void
     {
         foreach ($configs as $config => $paths) {
-            $paths = $this->filterPaths($paths);
+            if ($validatePaths) {
+                $paths = $this->filterPaths($paths);
+            }
 
             if (empty($paths)) {
                 continue;
             }
 
             $this->addScript(
-                sprintf($command, implode(' ', $paths), $config),
+                sprintf($command, '"'.implode('" "', $paths).'"', $config),
                 $name,
                 $scripts
             );
 
             $this->addScript(
-                sprintf($ciCommand, implode(' ', $paths), $config),
+                sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
                 self::CI_SCRIPT,
                 $scripts
             );
