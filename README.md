@@ -25,14 +25,25 @@ The `cs-fixer` script will fix the coding style in the `src/` directory accordin
 latest Contao coding standards. Create an `ecs.php` script in your project
 to extend the default configuration.
 
+You can extend the default configuration by adding a `ecs.php` file to your project root.
+
 ### Rector
 
 The `rector` script will automatically upgrade the code to match the latest Contao standards.
 
+You can extend the default configuration by adding a `rector.php` file to your project root.
+
 ### PHPStan
 
 The `phpstan` script will check your code with PHPStan.
-Create a `phpstan.neon` file in your project to extend the default configuration. 
+
+You can extend the default configuration by adding a `phpstan.neon` file to your project root.
+
+### Stylelint
+
+The `stylelint` script will check your CSS formatting with [Stylelint](https://stylelint.io).
+
+You can extend the default configuration by adding a `.stylelintrc` file to your project root.
 
 
 ### Ideas
@@ -61,27 +72,8 @@ on:
 permissions: read-all
 
 jobs:
-    ecs:
-        name: build-tools
-        runs-on: ubuntu-latest
-        steps:
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: 8.1
-                  extensions: dom, fileinfo, filter, gd, hash, intl, json, mbstring, mysqli, pcre, pdo_mysql, zlib
-                  coverage: none
-
-            - name: Checkout
-              uses: actions/checkout@v3
-
-            - name: Install the dependencies
-              run: |
-                  composer install --no-interaction --no-progress
-
-            - name: Run all build-tools to validate code
-              run: composer run build-tools
-
+    ci:
+        uses: 'terminal42/contao-build-tools/.github/workflows/build-tools.yml@main'
 ```
 
 
@@ -122,23 +114,6 @@ use Terminal42\ContaoBuildTools\Deployer;
 ```
 
 
-## Error tracking with [Sentry.io][Sentry]
-
-The `Terminal42\ContaoBuildTools\ErrorHandlingTrait` adds useful Sentry helpers.
-
- - `ErrorHandlingTrait::sentryOrThrow` will either log an error/exception to sentry,
-    or it will throw an exception if Sentry integration is not available (e.g. on localhost
-    or in `dev` environment). It is mostly useful when running looping cronjobs, like 
-    synchronizing Contao with a remote system, so an error on syncing a record will not prevent
-    the sync loop from finishing other records.
-
- - `ErrorHandlingTraig::sentryCheckIn` has been added for the new [Sentry Cron job monitoring][SentryCron].
-    Call `sentryCheckIn()` without argument to start a check in, and subsequently with a boolean
-    `true` or `false` after the job has successfully run or failed.
-
-
 [Deployer]: https://deployer.org
-[Sentry]: https://sentry.io
-[SentryCron]: https://docs.sentry.io/product/crons/
 [SFBP]: https://symfony.com/doc/current/best_practices.html
 [SBPB]: https://symfony.com/doc/current/bundles/best_practices.html
