@@ -163,21 +163,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $originalWorkingDir = getcwd();
         foreach ($binRoots as $binRoot) {
             if ($this->filesystem->exists($binRoot.'/package.json')) {
-                $output = Process::fromShellCommandline('yarn')
+                Process::fromShellCommandline('yarn')
                     ->setInput('install')
                     ->setWorkingDirectory($binRoot)
-                    ->mustRun()
-                    ->getOutput();
-
-                $io->write($output);
-
-                continue;
+                    ->mustRun(static function (string $type, string $buffer) use ($output) {
+                        $output->write($buffer);
+                    })
+                ;
             }
 
-            $this->executeInNamespace($application, $binRoot, $input, $output);
+            if ($this->filesystem->exists($binRoot.'/composer.json')) {
+                $this->executeInNamespace($application, $binRoot, $input, $output);
 
-            chdir($originalWorkingDir);
-            $this->resetComposers($application);
+                chdir($originalWorkingDir);
+                $this->resetComposers($application);
+            }
         }
     }
 
