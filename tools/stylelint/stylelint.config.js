@@ -16,7 +16,7 @@ let config = {
         ],
         "no-descending-specificity": null,
         "selector-class-pattern": [
-            "^[a-z0-9\\-_]+$",
+            "^[a-z0-9\\-_:]+$",
             { message: "Class selector should be written in lowercase with hyphens (selector-class-pattern)" }
         ],
         "selector-id-pattern": [
