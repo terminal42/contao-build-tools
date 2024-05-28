@@ -87,10 +87,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'stylelint',
             'Run stylelint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s/**/*.s?(a|c)ss --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --fix',
-            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s/**/*.s?(a|c)ss --config vendor/terminal42/contao-build-tools/tools/stylelint/%s',
+            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --fix',
+            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s',
             [
-                'stylelint.config.js' => ['./layout'],
+                'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => is_dir('./assets/contao') ? null : './assets/**/*.s?(a|c)ss']),
             ],
             $scripts
         );
@@ -242,8 +242,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     {
         $result = [];
 
-        foreach ($paths as $path) {
-            if (!file_exists($path)) {
+        foreach ($paths as $source => $path) {
+            if (!file_exists(\is_string($source) ? $source : $path)) {
                 continue;
             }
 
