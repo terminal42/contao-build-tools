@@ -76,7 +76,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'depcheck',
             'Run Dependency Analyzer on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/depcheck/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/terminal42/contao-build-tools/tools/depcheck/%s.php',
+            '@php vendor/terminal42/contao-build-tools/tools/composer-dependency-analyser/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/terminal42/contao-build-tools/tools/composer-dependency-analyser/%s.php',
             null,
             [
                 'config' => ['./composer.json'],
