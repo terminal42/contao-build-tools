@@ -67,6 +67,7 @@ if ($isBundle) {
         ->ignoreErrorsOnPackage('contao/conflicts', [ErrorType::UNUSED_DEPENDENCY])
         ->ignoreErrorsOnPackage('contao/manager-bundle', [ErrorType::UNUSED_DEPENDENCY])
         ->ignoreErrorsOnPackage('contao/core-bundle', [ErrorType::SHADOW_DEPENDENCY])
+        ->ignoreErrorsOnPackage('contao/manager-plugin', [ErrorType::SHADOW_DEPENDENCY])
     ;
 }
 
