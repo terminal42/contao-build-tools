@@ -31,3 +31,6 @@ parameters:
 
     doctrine:
         objectManagerLoader: tests/object-manager.php
+
+    ignoreErrors:
+        - '#Access to an undefined property Contao\\DataContainer::\$activeRecord.#'
