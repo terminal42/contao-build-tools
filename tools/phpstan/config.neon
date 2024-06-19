@@ -27,6 +27,7 @@ parameters:
 
     treatPhpDocTypesAsCertain: false
     checkMissingIterableValueType: false
+    reportUnmatchedIgnoredErrors: false
     rememberPossiblyImpureFunctionValues: false
 
     doctrine:
