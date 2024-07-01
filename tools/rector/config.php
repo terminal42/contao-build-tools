@@ -32,7 +32,8 @@ return static function (RectorConfig $rectorConfig): void {
             $parsedConstraints->matches($versionParser->parseConstraints('< 4.10')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.0')) => [ContaoLevelSetList::UP_TO_CONTAO_413],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
-            $parsedConstraints->matches($versionParser->parseConstraints('^5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 5.3')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
+            $parsedConstraints->matches($versionParser->parseConstraints('^5.3')) => [ContaoLevelSetList::UP_TO_CONTAO_53],
         };
 
         if (!empty($setList)) {
@@ -50,11 +51,9 @@ return static function (RectorConfig $rectorConfig): void {
             $parsedConstraints->matches($versionParser->parseConstraints('< 7.4')) => [LevelSetList::UP_TO_PHP_73],
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.0')) => [LevelSetList::UP_TO_PHP_74],
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.1')) => [LevelSetList::UP_TO_PHP_80],
-            $parsedConstraints->matches($versionParser->parseConstraints('^8.1')) => [
-                LevelSetList::UP_TO_PHP_81,
-                ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES,
-                DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-            ],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 8.2')) => [LevelSetList::UP_TO_PHP_81, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 8.3')) => [LevelSetList::UP_TO_PHP_82, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $parsedConstraints->matches($versionParser->parseConstraints('^8.3')) => [LevelSetList::UP_TO_PHP_83, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
         };
 
         if (!empty($setList)) {
