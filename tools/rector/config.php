@@ -79,9 +79,6 @@ return static function (RectorConfig $rectorConfig): void {
         ClassPropertyAssignToConstructorPromotionRector::class => [
             '*/Entity/'
         ],
-        TypedPropertyFromAssignsRector::class => [
-            '*/Entity/'
-        ],
         ContainerGetToConstructorInjectionRector::class => [
             '*/Model/',
             '*/FormField/',
