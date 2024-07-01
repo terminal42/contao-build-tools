@@ -26,7 +26,6 @@ parameters:
         - Contao\User
 
     treatPhpDocTypesAsCertain: false
-    checkMissingIterableValueType: false
     reportUnmatchedIgnoredErrors: false
     rememberPossiblyImpureFunctionValues: false
 
