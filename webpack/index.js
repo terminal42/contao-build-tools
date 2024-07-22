@@ -6,8 +6,24 @@ const getPublicDir = () => {
     return composerConfig['extra']['public-dir'] || (fs.existsSync(`${ process.cwd() }/web`) ? 'web' : 'public');
 }
 
+class AddHtaccessPlugin {
+    constructor (layoutDir) {
+        this.layoutDir = layoutDir
+    }
+
+    apply(compiler) {
+        compiler.hooks.done.tap('AddHtaccessPlugin', () => {
+            fs.copyFileSync(
+                fs.existsSync(`${ process.cwd() }/${ this.layoutDir }/.htaccess`) ? `${ process.cwd() }/${ this.layoutDir }/.htaccess` : `${ __dirname }/.htaccess`,
+                `${ process.cwd() }/${ getPublicDir() }/${ this.layoutDir }/.htaccess`,
+            );
+        });
+    }
+}
+
 const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
     const Encore = require('@symfony/webpack-encore');
+    const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
     Encore
         .setOutputPath(`${ getPublicDir() }/${ layoutDir }/`)
@@ -21,10 +37,21 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
         .enableSourceMaps()
         .enableVersioning(Encore.isProduction())
 
-        .addLoader({
-            test: /\.(gif|png|jpe?g|svg)$/i,
-            use: ['image-webpack-loader']
-        })
+        .addPlugin(new ImageMinimizerPlugin({
+            minimizer: {
+                implementation: ImageMinimizerPlugin.imageminMinify,
+                options: {
+                    plugins: [
+                        'imagemin-gifsicle',
+                        'imagemin-mozjpeg',
+                        'imagemin-pngquant',
+                        'imagemin-svgo',
+                    ],
+                },
+            },
+        }))
+
+        .addPlugin(new AddHtaccessPlugin(layoutDir))
 
         .configureDevServerOptions((options) => Object.assign({}, options, {
             static: false,
@@ -53,7 +80,7 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
         Encore.enablePostCssLoader((options) => {
             options.postcssOptions = {
                 plugins: {
-                    'autoprefixer': {},
+                    'autoprefixer': ["defaults"],
                 }
             }
         });
