@@ -7,15 +7,11 @@ const getPublicDir = () => {
 }
 
 class AddHtaccessPlugin {
-    constructor (layoutDir) {
-        this.layoutDir = layoutDir
-    }
-
     apply(compiler) {
         compiler.hooks.done.tap('AddHtaccessPlugin', () => {
             fs.copyFileSync(
                 fs.existsSync(`${ process.cwd() }/${ this.layoutDir }/.htaccess`) ? `${ process.cwd() }/${ this.layoutDir }/.htaccess` : `${ __dirname }/.htaccess`,
-                `${ process.cwd() }/${ getPublicDir() }/${ this.layoutDir }/.htaccess`,
+                `${ compiler.outputPath }/.htaccess`,
             );
         });
     }
@@ -51,7 +47,7 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
             },
         }))
 
-        .addPlugin(new AddHtaccessPlugin(layoutDir))
+        .addPlugin(new AddHtaccessPlugin())
 
         .configureDevServerOptions((options) => Object.assign({}, options, {
             static: false,
