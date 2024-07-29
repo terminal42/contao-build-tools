@@ -9,6 +9,7 @@ use Composer\Semver\VersionParser;
 use Deployer\Host\Host;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use function Deployer\currentHost;
 use function Deployer\error;
 use function Deployer\get;
@@ -384,10 +385,13 @@ class Deployer
 
     private function getSharedDirs(): array
     {
+        $composerConfig = json_decode(file_get_contents('./composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        $assetsDir = $composerConfig['extra']['contao-component-dir'] ?? 'assets';
+
         $sharedDirs = $this->sharedDirs;
 
         // Contao 4.13 (might already be defined in the default contao.php recipe but we want to be independent here)
-        $sharedDirs[] = 'assets/images'; // image thumbnails
+        $sharedDirs[] = Path::join($assetsDir, 'images'); // image thumbnails
         $sharedDirs[] = 'files'; // file uploads
         $sharedDirs[] = '{{public_path}}/share'; // share directory for news sitemaps
         $sharedDirs[] = 'system/config'; // old config files like localconfig.php, dcaconfig.php etc.
@@ -400,14 +404,12 @@ class Deployer
             $sharedDirs[] = 'contao-manager';
         }
 
-        $composerConfig = json_decode(file_get_contents('./composer.json'), true, 512, JSON_THROW_ON_ERROR);
-
         if (isset($composerConfig['require']['isotope/isotope-core'])) {
             $sharedDirs[] = 'isotope';
         }
 
         if (isset($composerConfig['require']['terminal42/contao-avatar'])) {
-            $sharedDirs[] = 'assets/avatars';
+            $sharedDirs[] = Path::join($assetsDir, 'avatars');
         }
 
         if (
@@ -419,7 +421,7 @@ class Deployer
 
         if ($this->isContao5()) {
             $sharedDirs[] = 'var/deferred-images'; // Deferred image meta data
-            $sharedDirs[] = 'assets/previews'; // File preview thumbnails
+            $sharedDirs[] = Path::join($assetsDir, 'previews'); // File preview thumbnails
         }
 
         return array_unique($sharedDirs);
