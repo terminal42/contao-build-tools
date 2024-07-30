@@ -210,7 +210,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript(string $name, string $description, string $command, string|null $ciCommand, array $configs, array &$scripts): void
+    private function registerConfigScript(string $name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts): void
     {
         foreach ($configs as $config => $paths) {
             $paths = $this->filterPaths($paths);
