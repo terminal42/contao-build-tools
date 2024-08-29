@@ -90,7 +90,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/terminal42/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint %s',
             null,
             [
-                '' => ['./config'],
+                '' => ['./config', './github'],
             ],
             $scripts
         );
