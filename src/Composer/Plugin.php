@@ -87,7 +87,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'yamllint',
             'Run yamllint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint %s',
+            'vendor/terminal42/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
             null,
             [
                 '' => ['./config', './github'],
