@@ -23,6 +23,7 @@ use Symfony\Component\Process\Process;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
+    private const FIX_SCRIPT = 'fix-tools';
     private const CI_SCRIPT = 'build-tools';
     private const LEGACY_MODULES = './system/modules';
 
@@ -237,6 +238,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             );
 
             $this->addScript(
+                sprintf($command, '"'.implode('" "', $paths).'"', $config),
+                self::FIX_SCRIPT,
+                $scripts
+            );
+
+            $this->addScript(
                 sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
                 self::CI_SCRIPT,
                 $scripts
@@ -246,6 +253,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         if (!empty($scripts[$name])) {
             $this->activatedScripts[$name] = $description;
             $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
+            $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [terminal42/contao-build-tools].';
         }
     }
 
