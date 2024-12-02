@@ -1,11 +1,13 @@
 <?php
 
+use function Deployer\askConfirmation;
 use function Deployer\currentHost;
 use function Deployer\get;
 use function Deployer\has;
 use function Deployer\info;
 use function Deployer\run;
 use function Deployer\task;
+use function Deployer\warning;
 
 require_once 'recipe/contao.php';
 
@@ -42,4 +44,16 @@ task('deploy:htaccess', static function () {
 
     run("cd {{release_path}}/$publicPath && if [ -f \"./.htaccess\" ]; then rm -f ./.htaccess; fi");
     run("cd {{release_path}}/$publicPath && if [ -f \"./$file\" ]; then mv ./$file ./.htaccess; fi");
+});
+
+task('contao:migrate', function () {
+    try {
+        run('{{bin/console}} contao:migrate {{console_options}}');
+    } catch (\Exception $e) {
+        warning($e->getMessage());
+
+        if (!askConfirmation('Database migration failed, continue deployment?')) {
+            exit(1);
+        }
+    }
 });
