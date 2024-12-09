@@ -64,6 +64,11 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
     // Automatically detect JavaScript files in the layout folder and add Encore entries
     if (detectEntries && fs.existsSync(`${ process.cwd() }/${ layoutDir }`)) {
         fs.readdirSync(`${ process.cwd() }/${ layoutDir }/`).filter(f => f.endsWith('.js')).forEach((file) => {
+            // Skip files with _ prefix.
+            if (file.substring(0, 1) === '_') {
+                return;
+            }
+
             Encore.addEntry(
                 file.substring(0, file.length - 3),
                 `./${ layoutDir }/${ file }`
@@ -85,6 +90,8 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
     return Encore;
 }
 
-module.exports = {
-    Encore: buildEncore,
-}
+module.exports = buildEncore;
+module.exports.Encore = (...args) => {
+    console && console.warn('💩 import { Encore } = … is deprecated, use import Encore = … instead!\n');
+    return buildEncore(...args);
+};
