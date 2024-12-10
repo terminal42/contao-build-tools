@@ -173,7 +173,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $originalWorkingDir = getcwd();
         foreach ($binRoots as $binRoot) {
-            if ($this->filesystem->exists($binRoot.'/package.json')) {
+            if (
+                $this->filesystem->exists($binRoot.'/package.json')
+                && ($this->filesystem->exists($originalWorkingDir.'/layout') || $this->filesystem->exists($originalWorkingDir.'/assets/contao'))
+            ) {
                 Process::fromShellCommandline('yarn')
                     ->setInput('install')
                     ->setWorkingDirectory($binRoot)
