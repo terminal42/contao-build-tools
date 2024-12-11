@@ -81,7 +81,27 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
         Encore.enablePostCssLoader((options) => {
             options.postcssOptions = {
                 plugins: {
-                    'autoprefixer': ["defaults"],
+                    autoprefixer: ['defaults'],
+                    cssnano: {
+                        preset: [
+                            'default',
+                            {
+                                mergeLonghand: false,
+                                discardComments: {
+                                    removeAll: true,
+                                },
+                                reduceIdents: false,
+                                minifySelectors: false,
+                                discardDuplicates: true,
+                                discardEmpty: true,
+                                normalizeWhitespace: true,
+                                calc: {
+                                    precision: 5,
+                                },
+                            },
+                        ],
+                    },
+                    'postcss-minify': {},
                 }
             }
         });
