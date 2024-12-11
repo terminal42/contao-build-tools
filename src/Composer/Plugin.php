@@ -99,10 +99,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'stylelint',
             'Run stylelint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --fix',
-            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s',
+            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
+            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --allow-empty-input',
             [
                 'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => is_dir('./assets/contao') ? null : './assets/**/*.s?(a|c)ss']),
+            ],
+            $scripts
+        );
+
+        $this->registerConfigScript(
+            'eslint',
+            'Run eslint on the project files [terminal42/contao-build-tools].',
+            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
+            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern',
+            [
+                '.eslintrc.json' => array_filter(['./layout' => './layout/**/*.js', './assets' => is_dir('./assets/contao') ? null : './assets/**/*.js']),
             ],
             $scripts
         );
