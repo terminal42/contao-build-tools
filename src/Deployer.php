@@ -28,6 +28,10 @@ class Deployer
     public const MAINTENANCE_ENABLE = 1;
     public const MAINTENANCE_DISABLE = 2;
     public const MAINTENANCE_BOTH = 3;
+    private const MAINTENANCE_IF_MIGRATIONS = 4;
+    public const MAINTENANCE_IF_MIGRATIONS_ENABLE = 5;
+    public const MAINTENANCE_IF_MIGRATIONS_DISABLE = 6;
+    public const MAINTENANCE_IF_MIGRATIONS_BOTH = 7;
 
     // Deployer setup
     private bool $lockDeployment = true;
@@ -40,7 +44,7 @@ class Deployer
     private bool $lockContaoManager = false;
     private bool $lockInstallTool = true;
     private bool $dumpEnvLocal = true;
-    private int $useMaintenanceMode = self::MAINTENANCE_BOTH;
+    private int $useMaintenanceMode = self::MAINTENANCE_IF_MIGRATIONS_BOTH;
     private bool $migrateDatabase = true;
     private bool $migrateDatabaseWithDeletes = false;
     private string|null $buildAssets = null;
@@ -350,8 +354,14 @@ class Deployer
             $body[] = 'contao:install:lock';
         }
 
+        set('skip_migrations', false);
+
+        if ($this->useMaintenanceMode & self::MAINTENANCE_IF_MIGRATIONS) {
+            $body[] = 'contao:migrate:check';
+        }
+
         if ($this->useMaintenanceMode & self::MAINTENANCE_ENABLE) {
-            $body[] = 'contao:maintenance:enable';
+            $body[] = 'contao:maintenance:enable'.($this->useMaintenanceMode & self::MAINTENANCE_IF_MIGRATIONS ? '-if-migrations' : '');
         }
 
         $body[] = 'deploy:symlink';
@@ -361,7 +371,7 @@ class Deployer
         }
 
         if ($this->migrateDatabase) {
-            $body[] =  'contao:migrate';
+            $body[] = 'contao:migrate';
 
             if ($this->migrateDatabaseWithDeletes) {
                 // TODO: implement contao:migrate --with-deletes
@@ -370,7 +380,7 @@ class Deployer
         }
 
         if ($this->useMaintenanceMode & self::MAINTENANCE_DISABLE) {
-            $body[] = 'contao:maintenance:disable';
+            $body[] = 'contao:maintenance:disable'.($this->useMaintenanceMode & self::MAINTENANCE_IF_MIGRATIONS ? '-if-migrations' : '');
         }
 
         if ($this->lockDeployment) {

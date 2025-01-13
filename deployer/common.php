@@ -5,7 +5,9 @@ use function Deployer\currentHost;
 use function Deployer\get;
 use function Deployer\has;
 use function Deployer\info;
+use function Deployer\invoke;
 use function Deployer\run;
+use function Deployer\set;
 use function Deployer\task;
 use function Deployer\warning;
 
@@ -47,6 +49,11 @@ task('deploy:htaccess', static function () {
 });
 
 task('contao:migrate', function () {
+    if (get('skip_migrations')) {
+        info(' … skipped');
+        return;
+    }
+
     try {
         run('{{bin/console}} contao:migrate {{console_options}}');
     } catch (\Exception $e) {
@@ -56,4 +63,29 @@ task('contao:migrate', function () {
             exit(1);
         }
     }
+});
+
+task('contao:migrate:check', function () {
+    if (!str_contains(run('{{bin/console}} contao:migrate --dry-run {{console_options}}'), 'Pending')) {
+        info(' … no migrations found, skipping maintenance mode & migrations');
+        set('skip_migrations', true);
+    }
+});
+
+task('contao:maintenance:enable-if-migrations', function () {
+    if (get('skip_migrations')) {
+        info(' … skipped');
+        return;
+    }
+
+    invoke('contao:maintenance:enable');
+});
+
+task('contao:maintenance:disable-if-migrations', function () {
+    if (get('skip_migrations')) {
+        info(' … skipped');
+        return;
+    }
+
+    invoke('contao:maintenance:disable');
 });
