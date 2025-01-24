@@ -194,8 +194,12 @@ class Deployer
         return $this->reset();
     }
 
-    public function buildAssets(string $publicDir = 'layout', string $buildCommand = 'yarn build'): self
+    public function buildAssets(string $publicDir = 'layout', string|null $buildCommand = null): self
     {
+        if (null === $buildCommand) {
+            $buildCommand = file_exists('./yarn.lock') ? 'yarn run build' : 'npm run build';
+        }
+
         $this->addUploadPaths[] = rtrim(get('public_path'), '/').'/'.ltrim($publicDir, '/');
         $this->buildAssets = $buildCommand;
 
