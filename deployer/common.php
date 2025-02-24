@@ -9,6 +9,7 @@ use function Deployer\invoke;
 use function Deployer\run;
 use function Deployer\set;
 use function Deployer\task;
+use function Deployer\test;
 use function Deployer\warning;
 
 require_once 'recipe/contao.php';
@@ -26,6 +27,15 @@ task('deploy:opcache', static function () {
     }
 
     run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
+});
+
+// Task: clear HTTP cache
+task('deploy:httpcache', static function () {
+    if (has('previous_release')) {
+        if (test("[ -d {{previous_release}}/var/cache/prod/http_cache ]")) {
+            run("rm -rf {{previous_release}}/var/cache/prod/http_cache");
+        }
+    }
 });
 
 // Task: Composer self update

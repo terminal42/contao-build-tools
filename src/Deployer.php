@@ -40,6 +40,7 @@ class Deployer
 
     // Custom tasks
     private bool $clearOpcache = false;
+    private bool $clearHttpCache = true;
     private bool $installContaoManager = true;
     private bool $lockContaoManager = false;
     private bool $lockInstallTool = true;
@@ -142,6 +143,13 @@ class Deployer
     public function includeSystemModules(bool $include = true): self
     {
         $this->includeSystemModules = $include;
+
+        return $this->reset();
+    }
+
+    public function keepHttpCache(bool $keep = true): self
+    {
+        $this->clearHttpCache = !$keep;
 
         return $this->reset();
     }
@@ -389,6 +397,10 @@ class Deployer
 
         if ($this->lockDeployment) {
             $body[] = 'deploy:unlock';
+        }
+
+        if ($this->clearHttpCache) {
+            $body[] = 'deploy:httpcache';
         }
 
         $body[] = 'deploy:cleanup';
