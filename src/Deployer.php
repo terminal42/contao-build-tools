@@ -42,7 +42,7 @@ class Deployer
     private bool $clearOpcache = false;
     private bool $clearHttpCache = true;
     private bool $installContaoManager = true;
-    private bool $lockContaoManager = false;
+    private bool|null $lockContaoManager = null;
     private bool $lockInstallTool = true;
     private bool $dumpEnvLocal = true;
     private int $useMaintenanceMode = self::MAINTENANCE_IF_MIGRATIONS_BOTH;
@@ -154,7 +154,7 @@ class Deployer
         return $this->reset();
     }
 
-    public function installContaoManager(bool $install = true, bool $lock = true): self
+    public function installContaoManager(bool $install = true, bool|null $lock = true): self
     {
         $this->installContaoManager = $install;
         $this->lockContaoManager = $lock;
@@ -357,7 +357,9 @@ class Deployer
         if ($this->installContaoManager) {
             $body[] = 'contao:manager:download';
 
-            if ($this->lockContaoManager) {
+            if (null === $this->lockContaoManager) {
+                $body[] = 'contao:manager:auto-lock';
+            } elseif ($this->lockContaoManager) {
                 $body[] = 'contao:manager:lock';
             }
         }

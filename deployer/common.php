@@ -43,6 +43,16 @@ task('deploy:composer-self-update', static function () {
     run('{{bin/composer}} self-update');
 });
 
+// Task: Lock Contao Manager if there is no users
+task('contao:manager:auto-lock', static function () {
+    if (test("[ -d {{release_or_current_path}}/contao-manager/users.json ]")) {
+        info(' … user.json found');
+        return;
+    }
+
+    invoke('contao:manager:lock');
+});
+
 // Task: deploy the .htaccess file
 task('deploy:htaccess', static function () {
     $file = currentHost()->get('htaccess_filename');
