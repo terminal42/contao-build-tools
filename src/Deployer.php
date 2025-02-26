@@ -41,7 +41,7 @@ class Deployer
     // Custom tasks
     private bool $clearOpcache = false;
     private bool $clearHttpCache = true;
-    private bool $installContaoManager = true;
+    private bool|null $installContaoManager = null;
     private bool|null $lockContaoManager = null;
     private bool $lockInstallTool = true;
     private bool $dumpEnvLocal = true;
@@ -154,7 +154,7 @@ class Deployer
         return $this->reset();
     }
 
-    public function installContaoManager(bool $install = true, bool|null $lock = true): self
+    public function installContaoManager(bool|null $install = true, bool|null $lock = true): self
     {
         $this->installContaoManager = $install;
         $this->lockContaoManager = $lock;
@@ -354,14 +354,12 @@ class Deployer
             $body[] = 'deploy:dump-env-local';
         }
 
-        if ($this->installContaoManager) {
+        if (true === $this->installContaoManager) {
             $body[] = 'contao:manager:download';
+        }
 
-            if (null === $this->lockContaoManager) {
-                $body[] = 'contao:manager:auto-lock';
-            } elseif ($this->lockContaoManager) {
-                $body[] = 'contao:manager:lock';
-            }
+        if (false !== $this->installContaoManager && true === $this->lockContaoManager) {
+            $body[] = 'contao:manager:lock';
         }
 
         if ($this->lockInstallTool && !$this->isContao5()) {
@@ -379,6 +377,10 @@ class Deployer
         }
 
         $body[] = 'deploy:symlink';
+
+        if (false !== $this->installContaoManager && null === $this->lockContaoManager) {
+            $body[] = 'contao:manager:auto-lock';
+        }
 
         if ($this->clearOpcache) {
             $body[] = 'deploy:opcache';
@@ -428,7 +430,7 @@ class Deployer
         $sharedDirs[] = 'var/logs'; // logs directory
 
         // Add or remove contao-manager directory
-        if ($this->installContaoManager) {
+        if (false !== $this->installContaoManager) {
             $sharedDirs[] = 'contao-manager';
         }
 
@@ -458,6 +460,10 @@ class Deployer
     private function getSharedFiles(): array
     {
         $sharedFiles = $this->sharedFiles;
+
+        if (null === $this->installContaoManager) {
+            $sharedFiles[] = '{{public_path}}/contao-manager.phar.php';
+        }
 
         foreach (['yaml', 'php', 'xml', 'yml'] as $ext) {
             if ((new Filesystem())->exists('config/parameters.'.$ext)) {
