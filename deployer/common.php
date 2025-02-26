@@ -31,9 +31,11 @@ task('deploy:opcache', static function () {
 
 // Task: clear HTTP cache
 task('deploy:httpcache', static function () {
-    if (has('previous_release')) {
-        if (test("[ -d {{previous_release}}/var/cache/prod/http_cache ]")) {
-            run("rm -rf {{previous_release}}/var/cache/prod/http_cache");
+    if (has('previous_release') && test('[ -d {{previous_release}}/var/cache/prod/http_cache ]')) {
+        try {
+            run('rm -rf {{previous_release}}/var/cache/prod/http_cache');
+        } catch (\Exception $e) {
+            warning(' … unable to remove all directories.');
         }
     }
 });
@@ -45,7 +47,7 @@ task('deploy:composer-self-update', static function () {
 
 // Task: Lock Contao Manager if there is no users
 task('contao:manager:auto-lock', static function () {
-    if (test("[ -d {{release_or_current_path}}/contao-manager/users.json ]")) {
+    if (test('[ -d {{release_or_current_path}}/contao-manager/users.json ]')) {
         info(' … user.json found');
         return;
     }
