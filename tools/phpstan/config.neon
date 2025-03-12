@@ -7,10 +7,6 @@ includes:
     - vendor/phpstan/phpstan-doctrine/rules.neon
     - vendor/slam/phpstan-extensions/conf/symfony-rules.neon
 
-rules:
-    - TheCodingMachine\PHPStan\Rules\Exceptions\DoNotThrowExceptionBaseClassRule
-    - TheCodingMachine\PHPStan\Rules\Exceptions\ThrowMustBundlePreviousExceptionRule
-
 parameters:
     level: 6
 
