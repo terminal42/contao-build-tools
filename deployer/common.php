@@ -47,7 +47,7 @@ task('deploy:composer-self-update', static function () {
 
 // Task: Lock Contao Manager if there is no users
 task('contao:manager:auto-lock', static function () {
-    if (test('[ -d {{release_or_current_path}}/contao-manager/users.json ]')) {
+    if (test('[ -f {{release_or_current_path}}/contao-manager/users.json ]')) {
         info(' … user.json found');
         return;
     }
