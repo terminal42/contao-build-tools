@@ -362,7 +362,7 @@ class Deployer
             $body[] = 'contao:manager:lock';
         }
 
-        if ($this->lockInstallTool && !$this->isContao5()) {
+        if ($this->lockInstallTool && !$this->isContao('^5.0')) {
             $body[] = 'contao:install:lock';
         }
 
@@ -449,9 +449,13 @@ class Deployer
             $sharedDirs[] = 'var/nc_bulky_items';
         }
 
-        if ($this->isContao5()) {
+        if ($this->isContao('^5.0')) {
             $sharedDirs[] = 'var/deferred-images'; // Deferred image meta data
             $sharedDirs[] = Path::join($assetsDir, 'previews'); // File preview thumbnails
+        }
+
+        if ($this->isContao('^5.5')) {
+            $sharedDirs[] = 'var/loupe'; // loupe directory for the backend search engine
         }
 
         return array_unique($sharedDirs);
@@ -521,8 +525,8 @@ class Deployer
         return $result;
     }
 
-    private function isContao5(): bool
+    private function isContao(string $requirement): bool
     {
-        return InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', '^5.0');
+        return InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', $requirement);
     }
 }
