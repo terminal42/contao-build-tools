@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Composer\Semver\VersionParser;
 use Contao\EasyCodingStandard\Fixer\CommentLengthFixer;
 use Contao\EasyCodingStandard\Fixer\TypeHintOrderFixer;
+use PhpCsFixer\Fixer\Comment\HeaderCommentFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
@@ -31,6 +32,7 @@ return static function (ECSConfig $ecsConfig): void {
         }
     }
 
+    $ecsConfig->ruleWithConfiguration(HeaderCommentFixer::class, ['header' => '']);
     $ecsConfig->skip($skip);
     $ecsConfig->parallel();
     $ecsConfig->lineEnding("\n");
