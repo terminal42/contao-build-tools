@@ -12,8 +12,6 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
-use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
 return static function (RectorConfig $rectorConfig): void {
 
@@ -78,12 +76,6 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         ClassPropertyAssignToConstructorPromotionRector::class => [
             '*/Entity/'
-        ],
-        ContainerGetToConstructorInjectionRector::class => [
-            '*/Model/',
-            '*/FormField/',
-            '*/FrontendModule/',
-            '*/ContentElement/',
         ],
 
         // Make sure hooks and callbacks are not converted to first class callables
