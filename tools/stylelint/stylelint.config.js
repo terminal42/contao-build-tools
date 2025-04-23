@@ -4,7 +4,6 @@ let config = {
     plugins: ["stylelint-prettier"],
     extends: [
         "stylelint-config-standard-scss",
-        "stylelint-config-rational-order",
     ],
     rules: {
         "no-duplicate-selectors": null,

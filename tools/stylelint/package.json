@@ -4,7 +4,6 @@
         "postcss": "^8.4.38",
         "prettier": "^3.2.5",
         "stylelint": "^16.5.0",
-        "stylelint-config-rational-order": "^0.1.2",
         "stylelint-config-standard-scss": "^13.1.0",
         "stylelint-prettier": "^5.0.0"
     },
