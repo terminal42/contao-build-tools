@@ -1,0 +1,35 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "files": {
+        "ignore": [
+            "assets/fonts/",
+            "layout/fonts/",
+            "assets/plugins/",
+            "layout/plugins/"
+        ]
+    },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120
+    },
+    "linter": {
+        "rules": {
+            "recommended": false,
+            "correctness": {
+                "noInvalidUseBeforeDeclaration": "error"
+            },
+            "style": {
+                "noParameterAssign": "error"
+            },
+            "suspicious": {
+                "noAssignInExpressions": "off"
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single"
+        }
+    }
+}

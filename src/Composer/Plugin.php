@@ -118,6 +118,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $scripts
         );
 
+        $this->registerConfigScript(
+            'biome',
+            'Run biome on the project files [terminal42/contao-build-tools].',
+            'vendor/terminal42/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path=vendor/terminal42/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
+            'vendor/terminal42/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path=vendor/terminal42/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
+            [
+                'biome.json' => array_filter(['./layout' => './layout/', './assets' => is_dir('./assets/contao') ? null : './assets/']),
+            ],
+            $scripts,
+            false
+        );
+
         $rootPackage = $composer->getPackage();
         $rootPackage->setScripts(
             array_merge(
@@ -242,7 +254,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript(string $name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts): void
+    private function registerConfigScript(string $name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
     {
         foreach ($configs as $config => $paths) {
             $paths = $this->filterPaths($paths);
@@ -257,23 +269,28 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 $scripts
             );
 
-            $this->addScript(
-                sprintf($command, '"'.implode('" "', $paths).'"', $config),
-                self::FIX_SCRIPT,
-                $scripts
-            );
+            if ($addToTools) {
+                $this->addScript(
+                    sprintf($command, '"'.implode('" "', $paths).'"', $config),
+                    self::FIX_SCRIPT,
+                    $scripts
+                );
 
-            $this->addScript(
-                sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
-                self::CI_SCRIPT,
-                $scripts
-            );
+                $this->addScript(
+                    sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
+                    self::CI_SCRIPT,
+                    $scripts
+                );
+            }
         }
 
         if (!empty($scripts[$name])) {
             $this->activatedScripts[$name] = $description;
-            $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
-            $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [terminal42/contao-build-tools].';
+
+            if ($addToTools) {
+                $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
+                $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [terminal42/contao-build-tools].';
+            }
         }
     }
 
