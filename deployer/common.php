@@ -29,9 +29,9 @@ task('deploy:opcache', static function () {
 
         run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
     } catch (\Exception $e) {
-        warning('Clearing the PHP OPcache failed: ' . $e->getMessage());
+        warning($e->getMessage());
 
-        if (!askConfirmation('Database migration failed, continue deployment?')) {
+        if (!askConfirmation('Clearing the PHP OPcache failed, continue deployment?')) {
             exit(1);
         }
     }
