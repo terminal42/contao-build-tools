@@ -16,17 +16,25 @@ require_once 'recipe/contao.php';
 
 // Task: clear opcache
 task('deploy:opcache', static function () {
-    if (has('opcache_command')) {
-        run('{{opcache_command}}');
-        return;
-    }
+    try {
+        if (has('opcache_command')) {
+            run('{{opcache_command}}');
+            return;
+        }
 
-    if (!has('public_url')) {
-        info(' … skipped');
-        return;
-    }
+        if (!has('public_url')) {
+            info(' … skipped');
+            return;
+        }
 
-    run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
+        run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
+    } catch (\Exception $e) {
+        warning($e->getMessage());
+
+        if (!askConfirmation('Clearing the PHP OPcache failed, continue deployment?')) {
+            exit(1);
+        }
+    }
 });
 
 // Task: clear HTTP cache
