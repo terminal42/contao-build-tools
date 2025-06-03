@@ -21,7 +21,7 @@ class CommandProvider implements CommandProviderCapability
         $commands = [];
 
         foreach ($this->plugin->activatedScripts as $script => $description) {
-            $commands[] = new ScriptAliasCommand($script, $description);
+            $commands[] = new ScriptAliasCommand($script, $description, $this->plugin->scriptAliases[$script] ?? []);
         }
 
         return $commands;

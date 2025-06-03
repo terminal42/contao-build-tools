@@ -29,6 +29,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
     private Filesystem $filesystem;
     public array $activatedScripts = [];
+    public array $scriptAliases = [];
 
     public function __construct()
     {
@@ -40,7 +41,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $scripts = [];
 
         $this->registerConfigScript(
-            'cs-fixer',
+            ['ecs', 'cs-fixer'],
             'Run code style fixes on the project files [terminal42/contao-build-tools].',
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
@@ -254,8 +255,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript(string $name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
+    private function registerConfigScript(string|array $name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
     {
+        $aliases = (array) $name;
+        $name = array_shift($aliases);
+
         foreach ($configs as $config => $paths) {
             $paths = $this->filterPaths($paths);
 
@@ -286,6 +290,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         if (!empty($scripts[$name])) {
             $this->activatedScripts[$name] = $description;
+            $this->scriptAliases[$name] = $aliases;
 
             if ($addToTools) {
                 $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
