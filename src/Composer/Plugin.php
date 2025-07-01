@@ -128,7 +128,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'biome.json' => array_filter(['./layout' => './layout/', './assets' => is_dir('./assets/contao') ? null : './assets/']),
             ],
             $scripts,
-            false
         );
 
         $rootPackage = $composer->getPackage();
