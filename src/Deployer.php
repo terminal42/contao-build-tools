@@ -527,6 +527,7 @@ class Deployer
 
     private function isContao(string $requirement): bool
     {
-        return InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', $requirement);
+        return InstalledVersions::isInstalled('contao/core-bundle') &&
+            InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', $requirement);
     }
 }
