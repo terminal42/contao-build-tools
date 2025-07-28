@@ -28,8 +28,11 @@ jobs:
               with:
                   show-progress: false
 
-            - name: Install the dependencies
+            - name: Install Composer dependencies
               uses: ramsey/composer-install@v3
+
+            - name: Install Node packages
+              run: npm install
 
             - name: Run all build-tools to validate code
               run: composer run build-tools

@@ -206,8 +206,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                     )
                 )
             ) {
-                Process::fromShellCommandline('yarn')
-                    ->setInput('install')
+                Process::fromShellCommandline('npm install')
                     ->setWorkingDirectory($binRoot)
                     ->mustRun(static function (string $type, string $buffer) use ($output) {
                         $output->write($buffer);
