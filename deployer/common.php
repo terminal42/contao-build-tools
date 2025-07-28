@@ -16,25 +16,30 @@ require_once 'recipe/contao.php';
 
 // Task: clear opcache
 task('deploy:opcache', static function () {
-    try {
-        if (has('opcache_command')) {
+    if (has('opcache_command')) {
+        try {
             run('{{opcache_command}}');
             return;
-        }
+        } catch (\Exception $e) {
+            // Ignore failing "pkill lsphp" on Cyon, the process does not always exist
+            if ('pkill lsphp' === get('opcache_command')) {
+                return;
+            }
 
-        if (!has('public_url')) {
-            info(' … skipped');
-            return;
-        }
+            warning($e->getMessage());
 
-        run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
-    } catch (\Exception $e) {
-        warning($e->getMessage());
-
-        if (!askConfirmation('Clearing the PHP OPcache failed, continue deployment?')) {
-            exit(1);
+            if (!askConfirmation('Clearing the PHP OPcache failed, continue deployment?')) {
+                exit(1);
+            }
         }
     }
+
+    if (!has('public_url')) {
+        info(' … skipped');
+        return;
+    }
+
+    run('cd {{release_path}} && echo "<?php opcache_reset(); clearstatcache(true);" > {{public_path}}/opcache.php && curl -sL {{public_url}}/opcache.php && rm {{public_path}}/opcache.php');
 });
 
 // Task: clear HTTP cache
