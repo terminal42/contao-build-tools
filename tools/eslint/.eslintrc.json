@@ -1,5 +1,9 @@
 {
     "extends": "airbnb",
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "requireConfigFile": false
+    },
     "env": {
         "amd": true,
         "commonjs": true,
