@@ -39,9 +39,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     public function activate(Composer $composer, IOInterface $io): void
     {
         $scripts = [];
+        $isProject = $this->isProject($composer);
         $phpSources = ['./src', './tests', './config'];
 
-        if (!$this->isComposerPackageType('project', $composer)) {
+        if (!$isProject) {
             $phpSources[] = './bin';
         }
 
@@ -108,7 +109,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
             'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --allow-empty-input',
             [
-                'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => is_dir('./assets/contao') ? null : './assets/**/*.s?(a|c)ss']),
+                'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss']),
             ],
             $scripts
         );
@@ -119,7 +120,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
             'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
-                '.eslintrc.json' => array_filter(['./layout' => './layout/**/*.js', './assets' => is_dir('./assets/contao') ? null : './assets/**/*.js']),
+                '.eslintrc.json' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
             ],
             $scripts
         );
@@ -130,7 +131,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/terminal42/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path=vendor/terminal42/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
             'vendor/terminal42/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path=vendor/terminal42/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
             [
-                'biome.json' => array_filter(['./layout' => './layout/', './assets' => is_dir('./assets/contao') ? null : './assets/']),
+                'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/']),
             ],
             $scripts,
         );
@@ -166,7 +167,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
 
         $event->getIO()->write('<warning>Installing tools …</warning>');
-        $this->executeAllNamespaces(new StringInput('install'), $event->getIO());
+        $this->executeAllNamespaces(new StringInput('install'), $event->getIO(), $event->getComposer());
     }
 
     public function updateTools(Event $event): void
@@ -176,7 +177,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
 
         $event->getIO()->write('<warning>Updating tools …</warning>');
-        $this->executeAllNamespaces(new StringInput('update'), $event->getIO());
+        $this->executeAllNamespaces(new StringInput('update'), $event->getIO(), $event->getComposer());
     }
 
     public static function getSubscribedEvents(): array
@@ -187,7 +188,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         ];
     }
 
-    private function executeAllNamespaces(InputInterface $input, IOInterface $io): void
+    private function executeAllNamespaces(InputInterface $input, IOInterface $io, Composer $composer): void
     {
         $application = new Application();
         $output = Factory::createOutput();
@@ -207,7 +208,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                     $this->filesystem->exists($originalWorkingDir.'/layout')
                     || (
                         $this->filesystem->exists($originalWorkingDir.'/assets')
-                        && !$this->filesystem->exists($originalWorkingDir.'/assets/contao')
+                        && !$this->isProject($composer)
                     )
                 )
             ) {
@@ -340,8 +341,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $scripts[$name][] = $command;
     }
 
-    private function isComposerPackageType(string $type, Composer $composer): bool
+    private function isProject(Composer $composer): bool
     {
-        return $type === $composer->getPackage()->getType();
+        return 'project' === $composer->getPackage()->getType();
     }
 }
