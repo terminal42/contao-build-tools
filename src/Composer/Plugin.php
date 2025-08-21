@@ -259,7 +259,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript(string|array $name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
+    private function registerConfigScript($name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
     {
         $aliases = (array) $name;
         $name = array_shift($aliases);
