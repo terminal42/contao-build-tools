@@ -77,7 +77,12 @@ class Deployer
         $host = host($name)->setDeployPath($path);
 
         if (null !== $this->hostname) {
-            $host->setHostname($this->hostname);
+            [$hostname, $port] = explode(':', $this->hostname, 2);
+            $host->setHostname($hostname);
+
+            if (null !== $port) {
+                $host->setPort($port);
+            }
         }
 
         if (null !== $this->remoteUser) {
