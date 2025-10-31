@@ -77,7 +77,7 @@ class Deployer
         $host = host($name)->setDeployPath($path);
 
         if (null !== $this->hostname) {
-            [$hostname, $port] = explode(':', $this->hostname, 2);
+            [$hostname, $port] = explode(':', $this->hostname, 2) + [null, null];
             $host->setHostname($hostname);
 
             if (null !== $port) {
