@@ -7,6 +7,7 @@ $files = [
     'phpstan.neon',
     'phpstan.neon.dist',
     'phpstan.dist.neon',
+    'phpstan-baseline.neon',
 ];
 
 foreach ($files as $file) {
