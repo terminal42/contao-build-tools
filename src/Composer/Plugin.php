@@ -136,6 +136,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $scripts,
         );
 
+        $this->registerConfigScript(
+            'twig-cs-fixer',
+            'Run Twig-CS-Fixer on the project files [terminal42/contao-build-tools].',
+            'vendor/terminal42/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/terminal42/contao-build-tools/tools/twig-cs-fixer/%s.php',
+            'vendor/terminal42/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/terminal42/contao-build-tools/tools/twig-cs-fixer/%s.php',
+            [
+                'config' => ['./templates', './contao/templates'],
+            ],
+            $scripts,
+        );
+
         $rootPackage = $composer->getPackage();
         $rootPackage->setScripts(
             array_merge(
