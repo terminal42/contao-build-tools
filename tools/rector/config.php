@@ -81,12 +81,6 @@ return static function (RectorConfig $rectorConfig): void {
             '*/Entity/'
         ],
 
-        // Make sure hooks and callbacks are not converted to first class callables
-        FirstClassCallableRector::class => [
-            '*/config.php',
-            '*/dca/*.php',
-        ],
-
         // Allow rand() in templates (e.g. for Isotope eCommerce)
         RandomFunctionRector::class => [
             '*.html5'
