@@ -12,6 +12,7 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
+use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
 
 return static function (RectorConfig $rectorConfig): void {
 
@@ -24,11 +25,12 @@ return static function (RectorConfig $rectorConfig): void {
 
     if ($contaoConstraint = $composerJson['require']['contao/core-bundle'] ?? $composerJson['require']['contao/manager-bundle'] ?? $composerJson['require-dev']['contao/core-bundle'] ?? $composerJson['require-dev']['contao/manager-bundle'] ?? null) {
         $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
+        $isContao4 = $parsedConstraints->matches($versionParser->parseConstraints('< 5.0'));
 
         $setList = match (true) {
             $parsedConstraints->matches($versionParser->parseConstraints('< 4.9')) => [],
             $parsedConstraints->matches($versionParser->parseConstraints('< 4.10')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 5.0')) => [ContaoLevelSetList::UP_TO_CONTAO_413],
+            $isContao4 => [ContaoLevelSetList::UP_TO_CONTAO_413],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.3')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.4')) => [ContaoLevelSetList::UP_TO_CONTAO_53],
@@ -38,6 +40,11 @@ return static function (RectorConfig $rectorConfig): void {
 
         if (!empty($setList)) {
             $rectorConfig->sets($setList);
+        }
+
+        if ($isContao4) {
+            // Request stack constructor argument is not available in Contao 4.13
+            $rectorConfig->skip([PushRequestToRequestStackConstructorRector::class]);
         }
     }
 
