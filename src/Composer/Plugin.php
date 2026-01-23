@@ -117,10 +117,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'eslint',
             'Run eslint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
-            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern',
+            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
+            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
-                '.eslintrc.json' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
+                'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
             ],
             $scripts
         );
