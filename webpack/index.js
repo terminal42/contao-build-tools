@@ -55,6 +55,7 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
             liveReload: true,
             allowedHosts: 'all',
             watchFiles: ['config/*', 'contao/**/*', 'src/**/*', 'templates/**/*', 'translations/**/*'],
+            server: "https",
             client: {
                 overlay: false
             },
