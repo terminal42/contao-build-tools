@@ -61,7 +61,8 @@ return static function (RectorConfig $rectorConfig): void {
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.2')) => [LevelSetList::UP_TO_PHP_81, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.3')) => [LevelSetList::UP_TO_PHP_82, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.4')) => [LevelSetList::UP_TO_PHP_83, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
-            $parsedConstraints->matches($versionParser->parseConstraints('^8.4')) => [LevelSetList::UP_TO_PHP_84, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 8.5')) => [LevelSetList::UP_TO_PHP_84, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $parsedConstraints->matches($versionParser->parseConstraints('^8.5')) => [LevelSetList::UP_TO_PHP_85, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
         };
 
         if (!empty($setList)) {
