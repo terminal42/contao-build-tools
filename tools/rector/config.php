@@ -10,6 +10,7 @@ use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
@@ -67,6 +68,33 @@ return static function (RectorConfig $rectorConfig): void {
 
         if (!empty($setList)) {
             $rectorConfig->sets($setList);
+        }
+    }
+
+    if ($phpunitConstraint = $composerJson['require-dev']['phpunit/phpunit'] ?? null) {
+        $parsedConstraints = $versionParser->parseConstraints($phpunitConstraint);
+        $setList = [
+            '>= 4.0' => PHPUnitSetList::PHPUNIT_40,
+            '>= 5.0' => PHPUnitSetList::PHPUNIT_50,
+            '>= 6.0' => PHPUnitSetList::PHPUNIT_60,
+            '>= 7.0' => PHPUnitSetList::PHPUNIT_70,
+            '>= 8.0' => PHPUnitSetList::PHPUNIT_80,
+            '>= 9.0' => PHPUnitSetList::PHPUNIT_90,
+            '>= 10.0' => PHPUnitSetList::PHPUNIT_100,
+            '>= 11.0' => PHPUnitSetList::PHPUNIT_110,
+            '>= 12.0' => PHPUnitSetList::PHPUNIT_120,
+        ];
+
+        $setList = array_filter(
+            $setList,
+            static fn ($constraint) => $parsedConstraints->matches($versionParser->parseConstraints($constraint)),
+            ARRAY_FILTER_USE_KEY,
+        );
+
+        if (!empty($setList)) {
+            $setList[] = PHPUnitSetList::PHPUNIT_CODE_QUALITY;
+            $setList[] = PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES;
+            $rectorConfig->sets(array_values($setList));
         }
     }
 
