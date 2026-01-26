@@ -53,7 +53,7 @@ const configs = [{
         }],
 
         'import/prefer-default-export': 'off',
-        'space-before-function-paren': ['error', 'never'],
+        'space-before-function-paren': ['error', 'always'],
     },
 }];
 
