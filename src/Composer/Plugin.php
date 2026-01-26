@@ -148,6 +148,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         );
 
         $rootPackage = $composer->getPackage();
+
+        if (isset($rootPackage->getScripts()['unit-tests'])) {
+            $scripts[self::FIX_SCRIPT][] = '@unit-tests';
+        }
+
         $rootPackage->setScripts(
             array_merge(
                 array_diff_key($scripts, $rootPackage->getScripts()),
