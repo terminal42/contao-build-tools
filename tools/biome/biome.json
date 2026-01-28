@@ -5,7 +5,8 @@
             "assets/fonts/",
             "layout/fonts/",
             "assets/plugins/",
-            "layout/plugins/"
+            "layout/plugins/",
+            "layout/vendor/"
         ]
     },
     "formatter": {
