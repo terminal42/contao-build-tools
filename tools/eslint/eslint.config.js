@@ -53,6 +53,7 @@ const configs = [{
         }],
 
         'import/prefer-default-export': 'off',
+        'class-methods-use-this': 'off',
     },
 }, globalIgnores(['layout/vendor/*'])];
 
