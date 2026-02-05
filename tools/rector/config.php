@@ -26,17 +26,18 @@ return static function (RectorConfig $rectorConfig): void {
 
     if ($contaoConstraint = $composerJson['require']['contao/core-bundle'] ?? $composerJson['require']['contao/manager-bundle'] ?? $composerJson['require-dev']['contao/core-bundle'] ?? $composerJson['require-dev']['contao/manager-bundle'] ?? null) {
         $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
+        $lowerBound = $parsedConstraints->getLowerBound();
         $isContao4 = $parsedConstraints->matches($versionParser->parseConstraints('< 5.0'));
 
         $setList = match (true) {
-            $parsedConstraints->matches($versionParser->parseConstraints('< 4.9')) => [],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 4.10')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 4.9')->getLowerBound(), '>') => [],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 4.10')->getLowerBound(), '>') => [ContaoLevelSetList::UP_TO_CONTAO_49],
             $isContao4 => [ContaoLevelSetList::UP_TO_CONTAO_413],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 5.3')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 5.4')) => [ContaoLevelSetList::UP_TO_CONTAO_53],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 5.7')) => [ContaoLevelSetList::UP_TO_CONTAO_55],
-            $parsedConstraints->matches($versionParser->parseConstraints('^5.7')) => [ContaoLevelSetList::UP_TO_CONTAO_57],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 5.1')->getLowerBound(), '>') => [ContaoLevelSetList::UP_TO_CONTAO_50],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 5.3')->getLowerBound(), '>') => [ContaoLevelSetList::UP_TO_CONTAO_51],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 5.4')->getLowerBound(), '>') => [ContaoLevelSetList::UP_TO_CONTAO_53],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 5.7')->getLowerBound(), '>') => [ContaoLevelSetList::UP_TO_CONTAO_55],
+            $lowerBound->compareTo($versionParser->parseConstraints('^5.7')->getLowerBound(), '>') => [ContaoLevelSetList::UP_TO_CONTAO_57],
         };
 
         if (!empty($setList)) {
@@ -50,20 +51,20 @@ return static function (RectorConfig $rectorConfig): void {
     }
 
     if ($phpConstraint = $composerJson['config']['platform']['php'] ?? $composerJson['require']['php'] ?? null) {
-        $parsedConstraints = $versionParser->parseConstraints($phpConstraint);
+        $lowerBound = $versionParser->parseConstraints($phpConstraint)->getLowerBound();
 
         $setList = match (true) {
-            $parsedConstraints->matches($versionParser->parseConstraints('< 7.1')) => [],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 7.2')) => [LevelSetList::UP_TO_PHP_71],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 7.3')) => [LevelSetList::UP_TO_PHP_72],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 7.4')) => [LevelSetList::UP_TO_PHP_73],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 8.0')) => [LevelSetList::UP_TO_PHP_74],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 8.1')) => [LevelSetList::UP_TO_PHP_80],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 8.2')) => [LevelSetList::UP_TO_PHP_81, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 8.3')) => [LevelSetList::UP_TO_PHP_82, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 8.4')) => [LevelSetList::UP_TO_PHP_83, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 8.5')) => [LevelSetList::UP_TO_PHP_84, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
-            $parsedConstraints->matches($versionParser->parseConstraints('^8.5')) => [LevelSetList::UP_TO_PHP_85, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 7.1')->getLowerBound(), '>') => [],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 7.2')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_71],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 7.3')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_72],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 7.4')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_73],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 8.0')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_74],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 8.1')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_80],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 8.2')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_81, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 8.3')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_82, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 8.4')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_83, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $lowerBound->compareTo($versionParser->parseConstraints('< 8.5')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_84, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $lowerBound->compareTo($versionParser->parseConstraints('^8.5')->getLowerBound(), '>') => [LevelSetList::UP_TO_PHP_85, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
         };
 
         if (!empty($setList)) {
@@ -72,7 +73,8 @@ return static function (RectorConfig $rectorConfig): void {
     }
 
     if ($phpunitConstraint = $composerJson['require-dev']['phpunit/phpunit'] ?? null) {
-        $parsedConstraints = $versionParser->parseConstraints($phpunitConstraint);
+        $lowerBound = $versionParser->parseConstraints($phpunitConstraint)->getLowerBound();
+
         $setList = [
             '>= 4.0' => PHPUnitSetList::PHPUNIT_40,
             '>= 5.0' => PHPUnitSetList::PHPUNIT_50,
@@ -87,7 +89,7 @@ return static function (RectorConfig $rectorConfig): void {
 
         $setList = array_filter(
             $setList,
-            static fn ($constraint) => $parsedConstraints->matches($versionParser->parseConstraints($constraint)),
+            static fn ($constraint) => $lowerBound->compareTo($versionParser->parseConstraints($constraint)->getLowerBound(), '>'),
             ARRAY_FILTER_USE_KEY,
         );
 
