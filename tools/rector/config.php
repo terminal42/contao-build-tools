@@ -82,7 +82,7 @@ return static function (RectorConfig $rectorConfig): void {
             '>= 7.0' => PHPUnitSetList::PHPUNIT_70,
             '>= 8.0' => PHPUnitSetList::PHPUNIT_80,
             '>= 9.0' => PHPUnitSetList::PHPUNIT_90,
-            '>= 10.0' => PHPUnitSetList::PHPUNIT_100,
+            '>= 10.0' => [PHPUnitSetList::PHPUNIT_100, PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES],
             '>= 11.0' => PHPUnitSetList::PHPUNIT_110,
             '>= 12.0' => PHPUnitSetList::PHPUNIT_120,
         ];
@@ -95,7 +95,6 @@ return static function (RectorConfig $rectorConfig): void {
 
         if (!empty($setList)) {
             $setList[] = PHPUnitSetList::PHPUNIT_CODE_QUALITY;
-            $setList[] = PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES;
             $rectorConfig->sets(array_values($setList));
         }
     }
