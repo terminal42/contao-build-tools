@@ -10,6 +10,7 @@ use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
+use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
@@ -121,6 +122,11 @@ return static function (RectorConfig $rectorConfig): void {
         // Allow rand() in templates (e.g. for Isotope eCommerce)
         RandomFunctionRector::class => [
             '*.html5'
+        ],
+
+        // Allow $this->addToAssertionCount(1);
+        AddDoesNotPerformAssertionToNonAssertingTestRector::class => [
+            '*/'
         ],
     ]);
 
