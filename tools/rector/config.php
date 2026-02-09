@@ -95,8 +95,15 @@ return static function (RectorConfig $rectorConfig): void {
         );
 
         if (!empty($setList)) {
-            $setList[] = PHPUnitSetList::PHPUNIT_CODE_QUALITY;
-            $rectorConfig->sets(array_values($setList));
+            $sets = [];
+            foreach ($setList as $rules) {
+                foreach ((array) $rules as $rule) {
+                    $sets[] = $rule;
+                }
+            }
+
+            $sets[] = PHPUnitSetList::PHPUNIT_CODE_QUALITY;
+            $rectorConfig->sets($sets);
         }
     }
 
