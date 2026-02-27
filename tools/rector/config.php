@@ -94,7 +94,7 @@ return static function (RectorConfig $rectorConfig): void {
         );
 
         if (!empty($setList)) {
-            $rectorConfig->sets(array_merge([PHPUnitSetList::PHPUNIT_CODE_QUALITY], ...$setList));
+            $rectorConfig->sets(array_merge([PHPUnitSetList::PHPUNIT_CODE_QUALITY], ...array_values($setList)));
         }
     }
 
