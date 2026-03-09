@@ -261,6 +261,7 @@ class Deployer
             'var',
             'var/cache',
             'var/logs',
+            'var/log',
             'system/tmp'
         ]);
 
@@ -433,6 +434,7 @@ class Deployer
         $sharedDirs[] = 'system/tmp'; // some extensions and even the core still upload to system/tmp
         $sharedDirs[] = 'var/backups'; // contao:database:backup directory
         $sharedDirs[] = 'var/logs'; // logs directory
+        $sharedDirs[] = 'var/log'; // logs directory
 
         // Add or remove contao-manager directory
         if (false !== $this->installContaoManager) {
