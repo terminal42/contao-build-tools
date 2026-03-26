@@ -41,6 +41,7 @@ const configs = [{
         'max-len': 0,
         'no-new': 0,
         'no-continue': 0,
+        'wrap-iife': 0,
         indent: ['error', 4],
         'import/no-extraneous-dependencies': 0,
 
