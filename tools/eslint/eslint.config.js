@@ -56,6 +56,10 @@ const configs = [{
             functions: false,
         }],
 
+        'no-unused-vars': ['error', {
+            caughtErrors: 'none',
+        }],
+
         'import/prefer-default-export': 'off',
         'class-methods-use-this': 'off',
     },
