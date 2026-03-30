@@ -41,8 +41,11 @@ const configs = [{
         'max-len': 0,
         'no-new': 0,
         'no-continue': 0,
+        'operator-linebreak': ['error', 'after'],
         'wrap-iife': 0,
-        indent: ['error', 4],
+        indent: ['error', 4, {
+            SwitchCase: 1,
+        }],
         'import/no-extraneous-dependencies': 0,
 
         'no-param-reassign': ['error', {
