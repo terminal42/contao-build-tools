@@ -17,16 +17,38 @@ class AddHtaccessPlugin {
     }
 }
 
-const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
+const buildEncore = (assetsDir = 'layout', detectEntries = true) => {
     const Encore = require('@symfony/webpack-encore');
     const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
+    if (!Encore.isRuntimeEnvironmentConfigured()) {
+        Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
+    }
+
+    // Allow to build multiple Encore configurations
+    Encore.reset();
+
     Encore
-        .setOutputPath(`${ getPublicDir() }/${ layoutDir }/`)
-        .setPublicPath(`/${ layoutDir }`)
+        .setOutputPath(`${ getPublicDir() }/${ assetsDir }/`)
+        .setPublicPath(`/${ assetsDir }`)
         .setManifestKeyPrefix('')
         .cleanupOutputBeforeBuild()
         .disableSingleRuntimeChunk()
+
+        .configureImageRule({
+            type: 'asset',
+        })
+
+        .configureBabel((config) => {
+            config.plugins.push('@babel/plugin-transform-class-properties');
+            config.plugins.push('@babel/plugin-transform-private-methods');
+        })
+
+        // enables @babel/preset-env polyfills
+        .configureBabelPresetEnv((config) => {
+            config.useBuiltIns = 'usage';
+            config.corejs = 3;
+        })
 
         .enableSassLoader()
         .enablePostCssLoader()
@@ -49,22 +71,21 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
 
         .addPlugin(new AddHtaccessPlugin())
 
-        .configureDevServerOptions((options) => Object.assign({}, options, {
-            static: false,
-            hot: true,
-            liveReload: true,
-            allowedHosts: 'all',
-            watchFiles: ['config/*', 'contao/**/*', 'src/**/*', 'templates/**/*', 'translations/**/*'],
-            server: "https",
-            client: {
-                overlay: false
-            },
-        }))
+        .configureDevServerOptions(options => {
+            options.static = false;
+            options.hot = true;
+            options.liveReload = true;
+            options.allowedHosts = 'all';
+            options.static = { watch: false }
+            options.watchFiles = { paths: ['config/*', 'contao/**/*', 'src/**/*', 'templates/**/*', 'translations/**/*'] };
+            options.server = { type: "https" };
+            options.client = { overlay: false };
+        })
     ;
 
     // Automatically detect JavaScript files in the layout folder and add Encore entries
-    if (detectEntries && fs.existsSync(`${ process.cwd() }/${ layoutDir }`)) {
-        fs.readdirSync(`${ process.cwd() }/${ layoutDir }/`).filter(f => f.endsWith('.js')).forEach((file) => {
+    if (detectEntries && fs.existsSync(`${ process.cwd() }/${ assetsDir }`)) {
+        fs.readdirSync(`${ process.cwd() }/${ assetsDir }/`).filter(f => f.endsWith('.js')).forEach((file) => {
             // Skip files with _ prefix.
             if (file.substring(0, 1) === '_') {
                 return;
@@ -72,8 +93,17 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
 
             Encore.addEntry(
                 file.substring(0, file.length - 3),
-                `./${ layoutDir }/${ file }`
+                `./${ assetsDir }/${ file }`
             );
+        });
+    }
+
+    // Automatically add all images to make them available in Twig templates
+    if (fs.existsSync(`${ process.cwd() }/${ assetsDir }/images`)) {
+        Encore.copyFiles({
+            from: `${ process.cwd() }/${ assetsDir }/images`,
+            to: 'images/[path][name].[hash:8].[ext]',
+            // pattern: /\.(gif|png|jpe?g|svg|webp)$/
         });
     }
 
@@ -102,7 +132,6 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
                             },
                         ],
                     },
-                    'postcss-minify': {},
                 }
             }
         });
@@ -112,7 +141,3 @@ const buildEncore = (layoutDir = 'layout', detectEntries = true) => {
 }
 
 module.exports = buildEncore;
-module.exports.Encore = (...args) => {
-    console && console.warn('💩 import { Encore } = … is deprecated, use import Encore = … instead!\n');
-    return buildEncore(...args);
-};
