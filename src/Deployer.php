@@ -35,7 +35,7 @@ class Deployer
 
     // Deployer setup
     private bool $lockDeployment = true;
-    private int $timeout = 300;
+    private int|null $timeout = 300;
     private int $keepReleases = 10;
 
     // Custom tasks
@@ -219,7 +219,7 @@ class Deployer
         return $this;
     }
 
-    public function setTimeout(int $timeout): self
+    public function setTimeout(int|null $timeout): self
     {
         $this->timeout = $timeout;
 
