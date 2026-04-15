@@ -18,15 +18,16 @@ jobs:
                   coverage: none
 
             -   name: Install Node.js
-                uses: actions/setup-node@v4
+                uses: actions/setup-node@v6
                 with:
-                    node-version: 20
+                    node-version: 24
             -   run: corepack enable
 
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   show-progress: false
+                  persist-credentials: false
 
             - name: Install Composer dependencies
               uses: ramsey/composer-install@v3
