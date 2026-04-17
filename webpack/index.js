@@ -56,6 +56,7 @@ const buildEncore = (assetsDir = 'layout', detectEntries = true) => {
         .enableVersioning(Encore.isProduction())
 
         .addPlugin(new ImageMinimizerPlugin({
+            exclude: /\/fa-.+\.svg$/, // Ignore font-awesome icons
             minimizer: {
                 implementation: ImageMinimizerPlugin.imageminMinify,
                 options: {
