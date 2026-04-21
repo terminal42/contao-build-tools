@@ -40,7 +40,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     {
         $scripts = [];
         $isProject = $this->isProject($composer);
-        $phpSources = ['./src', './tests', './config'];
+        $phpSources = ['./src', './tests', './config/*.php' => './config'];
 
         if (!$isProject) {
             $phpSources[] = './bin';
@@ -324,7 +324,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $result = [];
 
         foreach ($paths as $source => $path) {
-            if (!file_exists(\is_string($source) ? $source : $path)) {
+            $file = \is_string($source) ? $source : $path;
+
+            if (
+                !file_exists($file)
+                && (!str_contains($file, '*') || !glob($file))
+            ) {
                 continue;
             }
 
