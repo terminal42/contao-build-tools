@@ -15,10 +15,9 @@ use PhpCsFixer\Fixer\Strict\StrictParamFixer;
 use SlevomatCodingStandard\Sniffs\Namespaces\ReferenceUsedNamesOnlySniff;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return static function (ECSConfig $ecsConfig): void {
-    $ecsConfig->sets([__DIR__.'/default.php']);
-
-    $ecsConfig->skip([
+$builder = ECSConfig::configure()
+    ->withSets([__DIR__.'/default.php'])
+    ->withSkip([
         BlankLineAfterOpeningTagFixer::class,
         DeclareStrictTypesFixer::class,
         LinebreakAfterOpeningTagFixer::class,
@@ -30,12 +29,27 @@ return static function (ECSConfig $ecsConfig): void {
         VisibilityRequiredFixer::class,
         VoidReturnFixer::class,
         ControlStructureBracesFixer::class,
-    ]);
+    ])
+    ->withFileExtensions(['html5'])
+    ->withCache(sys_get_temp_dir().'/ecs_template_cache');
 
-    $ecsConfig->fileExtensions(['html5']);
-    $ecsConfig->cacheDirectory(sys_get_temp_dir().'/ecs_template_cache');
+return new class ($builder) {
+    public function __construct(private $builder)
+    {
+    }
 
-    if (file_exists(getcwd().'/ecs.php')) {
-        $ecsConfig->import(getcwd().'/ecs.php');
+    public function __invoke(ECSConfig $ecsConfig): void
+    {
+        ($this->builder)($ecsConfig);
+
+        $rootConfigFile = getcwd().'/ecs.php';
+        if (!file_exists($rootConfigFile)) {
+            return;
+        }
+
+        $rootConfig = require $rootConfigFile;
+        if (is_callable($rootConfig)) {
+            $rootConfig($ecsConfig);
+        }
     }
 };
