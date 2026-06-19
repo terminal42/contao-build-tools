@@ -24,5 +24,8 @@
     },
     "files": [
         "index.js"
-    ]
+    ],
+    "bin": {
+        "encore": "./node_modules/@symfony/webpack-encore/bin/encore.js"
+    }
 }
