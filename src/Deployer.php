@@ -57,7 +57,7 @@ class Deployer
     private array $sharedDirs = [];
     private array $sharedFiles = [];
 
-    public function __construct(private string|null $hostname = null, private string|null $remoteUser = null, string $phpBinary = null)
+    public function __construct(private string|null $hostname = null, private string|null $remoteUser = null, string|null $phpBinary = null)
     {
         require_once __DIR__.'/../deployer/common.php';
 
@@ -72,7 +72,7 @@ class Deployer
         $this->reset();
     }
 
-    public function addTarget(string $name, string $path, string $publicURL = null, string $htaccessFile = null): self
+    public function addTarget(string $name, string $path, string|null $publicURL = null, string|null $htaccessFile = null): self
     {
         $host = host($name)->setDeployPath($path);
 
