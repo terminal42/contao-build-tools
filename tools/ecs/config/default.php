@@ -13,6 +13,7 @@ $skip = [
     CommentLengthFixer::class,
     MethodChainingIndentationFixer::class => [
         '*/DependencyInjection/Configuration.php',
+        '*/*Bundle.php',
     ],
 ];
 
