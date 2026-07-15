@@ -9,17 +9,14 @@ use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\Php81\Rector\Array_\FirstClassCallableRector;
 use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
-use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
 
 return static function (RectorConfig $rectorConfig): void {
-
     if (!file_exists(getcwd().'/composer.json')) {
-        throw new \RuntimeException('No composer.json found.');
+        throw new RuntimeException('No composer.json found.');
     }
 
     $versionParser = new VersionParser();
@@ -95,30 +92,30 @@ return static function (RectorConfig $rectorConfig): void {
     // https://getrector.com/blog/5-common-mistakes-in-rector-config-and-how-to-avoid-them
     $rectorConfig->sets([
         SetList::DEAD_CODE,
-        //SetList::CODE_QUALITY,
-        //SetList::CODING_STYLE,
-        //SetList::NAMING,
-        //SetList::TYPE_DECLARATION,
-        //SetList::PRIVATIZATION,
-        //SetList::EARLY_RETURN,
-        //SetList::INSTANCEOF,
+        // SetList::CODE_QUALITY,
+        // SetList::CODING_STYLE,
+        // SetList::NAMING,
+        // SetList::TYPE_DECLARATION,
+        // SetList::PRIVATIZATION,
+        // SetList::EARLY_RETURN,
+        // SetList::INSTANCEOF,
     ]);
 
-    $rectorConfig->symfonyContainerPhp(__DIR__ . '/tests/symfony-container.php');
+    $rectorConfig->symfonyContainerPhp(__DIR__.'/tests/symfony-container.php');
 
     $rectorConfig->skip([
         ClassPropertyAssignToConstructorPromotionRector::class => [
-            '*/Entity/'
+            '*/Entity/',
         ],
 
         // Allow rand() in templates (e.g. for Isotope eCommerce)
         RandomFunctionRector::class => [
-            '*.html5'
+            '*.html5',
         ],
 
         // Allow $this->addToAssertionCount(1);
         AddDoesNotPerformAssertionToNonAssertingTestRector::class => [
-            '*/'
+            '*/',
         ],
     ]);
 

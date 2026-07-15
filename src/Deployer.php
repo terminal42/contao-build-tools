@@ -7,9 +7,9 @@ namespace Terminal42\ContaoBuildTools;
 use Composer\InstalledVersions;
 use Composer\Semver\VersionParser;
 use Deployer\Host\Host;
-
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+
 use function Deployer\currentHost;
 use function Deployer\error;
 use function Deployer\get;
@@ -25,49 +25,77 @@ use function Deployer\warning;
 class Deployer
 {
     public const MAINTENANCE_NONE = 0;
+
     public const MAINTENANCE_ENABLE = 1;
+
     public const MAINTENANCE_DISABLE = 2;
+
     public const MAINTENANCE_BOTH = 3;
-    private const MAINTENANCE_IF_MIGRATIONS = 4;
+
     public const MAINTENANCE_IF_MIGRATIONS_ENABLE = 5;
+
     public const MAINTENANCE_IF_MIGRATIONS_DISABLE = 6;
+
     public const MAINTENANCE_IF_MIGRATIONS_BOTH = 7;
+
+    private const MAINTENANCE_IF_MIGRATIONS = 4;
 
     // Deployer setup
     private bool $lockDeployment = true;
+
     private int|null $timeout = 300;
+
     private int $keepReleases = 10;
 
     // Custom tasks
     private bool $clearOpcache = false;
+
     private bool $clearHttpCache = true;
+
     private bool|null $installContaoManager = null;
+
     private bool|null $lockContaoManager = null;
+
     private bool $lockInstallTool = true;
+
     private bool $dumpEnvLocal = true;
+
     private int $useMaintenanceMode = self::MAINTENANCE_IF_MIGRATIONS_BOTH;
+
     private bool $migrateDatabase = true;
+
     private bool $migrateDatabaseWithDeletes = false;
+
     private string|null $buildAssets = null;
 
     // Files and folders
     private bool $includeSystemModules = false;
+
     private array $addUploadPaths = [];
+
     private array $removeUploadPaths = [];
+
     private array $sharedDirs = [];
+
     private array $sharedFiles = [];
 
-    public function __construct(private string|null $hostname = null, private string|null $remoteUser = null, string|null $phpBinary = null)
-    {
+    public function __construct(
+        private string|null $hostname = null,
+        private string|null $remoteUser = null,
+        string|null $phpBinary = null,
+    ) {
         require_once __DIR__.'/../deployer/common.php';
 
         if (null !== $phpBinary) {
             set('bin/php', $phpBinary);
         }
 
-        task('error:run', static function () {
-            error('Please call Deployer::run() after configuration is complete.');
-        });
+        task(
+            'error:run',
+            static function (): void {
+                error('Please call Deployer::run() after configuration is complete.');
+            },
+        );
 
         $this->reset();
     }
@@ -198,7 +226,7 @@ class Deployer
 
     public function useMaintenanceMode(bool|int $maintenanceMode = true): self
     {
-        if (is_bool($maintenanceMode)) {
+        if (\is_bool($maintenanceMode)) {
             $this->useMaintenanceMode = $maintenanceMode ? self::MAINTENANCE_BOTH : self::MAINTENANCE_NONE;
         } else {
             $this->useMaintenanceMode = $maintenanceMode;
@@ -235,7 +263,7 @@ class Deployer
 
     public function run(): self
     {
-        require_once('./vendor/autoload.php');
+        require_once './vendor/autoload.php';
 
         set('keep_releases', $this->keepReleases);
         set('default_timeout', $this->timeout);
@@ -244,25 +272,28 @@ class Deployer
         set('shared_dirs', $this->getSharedDirs());
         set('shared_files', $this->getSharedFiles());
 
-        set('bin/composer', function () {
-            if (test('[ -f {{deploy_path}}/.dep/composer.phar ]')) {
-                run('{{bin/php}} {{deploy_path}}/.dep/composer.phar self-update');
+        set(
+            'bin/composer',
+            static function () {
+                if (test('[ -f {{deploy_path}}/.dep/composer.phar ]')) {
+                    run('{{bin/php}} {{deploy_path}}/.dep/composer.phar self-update');
+
+                    return '{{bin/php}} {{deploy_path}}/.dep/composer.phar';
+                }
+
+                run('cd {{deploy_path}} && curl -sS https://getcomposer.org/installer | {{bin/php}}');
+                run('mv {{deploy_path}}/composer.phar {{deploy_path}}/.dep/composer.phar');
 
                 return '{{bin/php}} {{deploy_path}}/.dep/composer.phar';
-            }
-
-            run("cd {{deploy_path}} && curl -sS https://getcomposer.org/installer | {{bin/php}}");
-            run('mv {{deploy_path}}/composer.phar {{deploy_path}}/.dep/composer.phar');
-
-            return '{{bin/php}} {{deploy_path}}/.dep/composer.phar';
-        });
+            },
+        );
 
         set('writable_dirs', [
             'var',
             'var/cache',
             'var/logs',
             'var/log',
-            'system/tmp'
+            'system/tmp',
         ]);
 
         task('deploy:upload', $this->uploadClosure());
@@ -295,7 +326,7 @@ class Deployer
 
         foreach ($paths as $k => $v) {
             if (!(new Filesystem())->exists($v)) {
-                unset ($paths[$k]);
+                unset($paths[$k]);
             }
         }
 
@@ -303,7 +334,7 @@ class Deployer
             $paths = array_merge($paths, $this->getSystemModulesPaths());
         }
 
-        return function () use ($paths) {
+        return function () use ($paths): void {
             $localPaths = array_values($paths);
 
             $localPaths = array_merge($localPaths, $this->pathClosure($this->addUploadPaths));
@@ -316,10 +347,14 @@ class Deployer
             $localPaths = array_unique($localPaths);
 
             foreach ($localPaths as $path) {
-                upload($path, '{{release_path}}/', [
-                    'options' => ['--recursive', '--relative'],
-                    'progress_bar' => false,
-                ]);
+                upload(
+                    $path,
+                    '{{release_path}}/',
+                    [
+                        'options' => ['--recursive', '--relative'],
+                        'progress_bar' => false,
+                    ],
+                );
             }
         };
     }
@@ -329,9 +364,12 @@ class Deployer
         $body = [];
 
         if (null !== $this->buildAssets) {
-            task('deploy:build-assets', function () {
-                runLocally($this->buildAssets);
-            })->once();
+            task(
+                'deploy:build-assets',
+                function (): void {
+                    runLocally($this->buildAssets);
+                },
+            )->once();
 
             $body[] = 'deploy:build-assets';
         }
@@ -350,13 +388,16 @@ class Deployer
         $body[] = 'deploy:htaccess';
 
         if ($this->dumpEnvLocal) {
-            task('deploy:dump-env-local', function () {
-                if (!str_contains(run('{{bin/console}} list {{console_options}}'), 'dotenv:dump')) {
-                    warning('Cannot dump .env.local.php, dotenv:dump command is not registered - skipping');
-                } else {
-                    run('{{bin/console}} dotenv:dump {{console_options}}');
-                }
-            });
+            task(
+                'deploy:dump-env-local',
+                static function (): void {
+                    if (!str_contains(run('{{bin/console}} list {{console_options}}'), 'dotenv:dump')) {
+                        warning('Cannot dump .env.local.php, dotenv:dump command is not registered - skipping');
+                    } else {
+                        run('{{bin/console}} dotenv:dump {{console_options}}');
+                    }
+                },
+            );
             $body[] = 'deploy:dump-env-local';
         }
 
@@ -501,6 +542,7 @@ class Deployer
         // Upload all system/modules that are not .gitignore'd
         $gitignore = file('.gitignore') ?: [];
         $unignore = \in_array('/system/modules/*', $gitignore, true);
+
         foreach (scandir('system/modules') as $folder) {
             if (
                 '.' === $folder
@@ -534,7 +576,7 @@ class Deployer
 
     private function isContao(string $requirement): bool
     {
-        return InstalledVersions::isInstalled('contao/core-bundle') &&
-            InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', $requirement);
+        return InstalledVersions::isInstalled('contao/core-bundle')
+            && InstalledVersions::satisfies(new VersionParser(), 'contao/core-bundle', $requirement);
     }
 }

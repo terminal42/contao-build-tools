@@ -31,9 +31,10 @@ $builder = ECSConfig::configure()
         ControlStructureBracesFixer::class,
     ])
     ->withFileExtensions(['html5'])
-    ->withCache(sys_get_temp_dir().'/ecs_template_cache');
+    ->withCache(sys_get_temp_dir().'/ecs_template_cache')
+;
 
-return new class ($builder) {
+return new class($builder) {
     public function __construct(private $builder)
     {
     }

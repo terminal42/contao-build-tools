@@ -24,12 +24,16 @@ use Symfony\Component\Process\Process;
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     private const FIX_SCRIPT = 'fix-tools';
+
     private const CI_SCRIPT = 'build-tools';
+
     private const LEGACY_MODULES = './system/modules';
 
-    private Filesystem $filesystem;
     public array $activatedScripts = [];
+
     public array $scriptAliases = [];
+
+    private Filesystem $filesystem;
 
     public function __construct()
     {
@@ -65,9 +69,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
             '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
-                'config' => [...$phpSources, './contao', './templates', self::LEGACY_MODULES]
+                'config' => [...$phpSources, './contao', './templates', self::LEGACY_MODULES],
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
@@ -76,9 +80,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
             null,
             [
-                'config' => [...$phpSources, self::LEGACY_MODULES]
+                'config' => [...$phpSources, self::LEGACY_MODULES],
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
@@ -89,7 +93,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             [
                 'config' => ['./composer.json'],
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
@@ -100,7 +104,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             [
                 '' => ['./config', './github'],
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
@@ -111,7 +115,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             [
                 'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss']),
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
@@ -122,7 +126,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             [
                 'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
@@ -156,8 +160,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $rootPackage->setScripts(
             array_merge(
                 array_diff_key($scripts, $rootPackage->getScripts()),
-                $rootPackage->getScripts()
-            )
+                $rootPackage->getScripts(),
+            ),
         );
     }
 
@@ -217,6 +221,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
 
         $originalWorkingDir = getcwd();
+
         foreach ($binRoots as $binRoot) {
             if (
                 $this->filesystem->exists($binRoot.'/package.json')
@@ -230,9 +235,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             ) {
                 Process::fromShellCommandline('npm install')
                     ->setWorkingDirectory($binRoot)
-                    ->mustRun(static function (string $type, string $buffer) use ($output) {
-                        $output->write($buffer);
-                    })
+                    ->mustRun(
+                        static function (string $type, string $buffer) use ($output): void {
+                            $output->write($buffer);
+                        },
+                    )
                 ;
             }
 
@@ -258,9 +265,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $this->filesystem->dumpFile(Factory::getComposerFile(), '{}');
         }
 
-        $input = new StringInput((string) $input . ' --quiet --working-dir=.');
+        $input = new StringInput($input.' --quiet --working-dir=.');
 
-        $output->write('<info>Run with <comment>' . $input->__toString() . '</comment></info>', true, IOInterface::VERBOSE);
+        $output->write('<info>Run with <comment>'.$input->__toString().'</comment></info>', true, IOInterface::VERBOSE);
 
         return $application->doRun($input, $output);
     }
@@ -268,6 +275,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     private function resetComposers(Application $application): void
     {
         $application->resetComposer();
+
         foreach ($application->all() as $command) {
             if ($command instanceof BaseCommand) {
                 $command->resetComposer();
@@ -275,7 +283,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript($name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
+    private function registerConfigScript($name, string $description, string $command, string|null $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
     {
         $aliases = (array) $name;
         $name = array_shift($aliases);
@@ -288,22 +296,22 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             }
 
             $this->addScript(
-                sprintf($command, '"'.implode('" "', $paths).'"', $config),
+                \sprintf($command, '"'.implode('" "', $paths).'"', $config),
                 $name,
-                $scripts
+                $scripts,
             );
 
             if ($addToTools) {
                 $this->addScript(
-                    sprintf($command, '"'.implode('" "', $paths).'"', $config),
+                    \sprintf($command, '"'.implode('" "', $paths).'"', $config),
                     self::FIX_SCRIPT,
-                    $scripts
+                    $scripts,
                 );
 
                 $this->addScript(
-                    sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
+                    \sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
                     self::CI_SCRIPT,
-                    $scripts
+                    $scripts,
                 );
             }
         }
@@ -334,7 +342,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             }
 
             if (self::LEGACY_MODULES === $path) {
-                foreach(scandir(self::LEGACY_MODULES) as $dir) {
+                foreach (scandir(self::LEGACY_MODULES) as $dir) {
                     if ('.' === $dir || '..' === $dir) {
                         continue;
                     }

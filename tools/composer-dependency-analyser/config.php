@@ -6,18 +6,18 @@ use ShipMonk\ComposerDependencyAnalyser\Config\Configuration;
 use ShipMonk\ComposerDependencyAnalyser\Config\ErrorType;
 
 if (!file_exists(getcwd().'/composer.json')) {
-    throw new \RuntimeException('No composer.json found.');
+    throw new RuntimeException('No composer.json found.');
 }
 
 $config = null;
 
 if (file_exists('./composer-dependency-analyser.php')) {
     trigger_error('Using config '.getcwd().'/composer-dependency-analyser.php');
-    $config = require('./composer-dependency-analyser.php');
+    $config = require './composer-dependency-analyser.php';
 } elseif (file_exists('./depcheck.php')) {
     trigger_error('Using config '.getcwd().'/depcheck.php');
-    trigger_error('Please rename your "depcheck.php" file to "composer-dependency-analyser.php".', E_USER_DEPRECATED);
-    $config = require('./depcheck.php');
+    @trigger_error('Please rename your "depcheck.php" file to "composer-dependency-analyser.php".', E_USER_DEPRECATED);
+    $config = require './depcheck.php';
 }
 
 if (!$config instanceof Configuration) {
@@ -56,7 +56,7 @@ if (file_exists('./deploy.php')) {
 }
 
 $composerJson = json_decode(file_get_contents(getcwd().'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-$isBundle = \in_array($composerJson['type'] ?? null, ['contao-bundle', 'contao-module']);
+$isBundle = in_array($composerJson['type'] ?? null, ['contao-bundle', 'contao-module'], true);
 $isProject = isset($composerJson['require']['contao/manager-bundle']);
 
 if ($isBundle) {
@@ -76,7 +76,7 @@ foreach (array_keys($composerJson['require']) as $packageName) {
     if (file_exists(getcwd().'/vendor/'.$packageName.'/composer.json')) {
         $data = json_decode(file_get_contents(getcwd().'/vendor/'.$packageName.'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        if (\in_array($data['type'] ?? null, ['contao-bundle', 'contao-module'])) {
+        if (in_array($data['type'] ?? null, ['contao-bundle', 'contao-module'], true)) {
             $config->ignoreErrorsOnPackage($packageName, [ErrorType::UNUSED_DEPENDENCY]);
         }
     }

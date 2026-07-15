@@ -36,9 +36,10 @@ $builder = ECSConfig::configure()
     ->withSkip($skip)
     ->withParallel()
     ->withSpacing(null, "\n")
-    ->withCache(sys_get_temp_dir().'/ecs_default_cache');
+    ->withCache(sys_get_temp_dir().'/ecs_default_cache')
+;
 
-return new class ($builder) {
+return new class($builder) {
     public function __construct(private $builder)
     {
     }

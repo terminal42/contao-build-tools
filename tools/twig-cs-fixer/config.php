@@ -12,14 +12,14 @@ use TwigCsFixer\Rules\Variable\VariableNameRule;
 use TwigCsFixer\Ruleset\Ruleset;
 use TwigCsFixer\Standard\TwigCsFixer;
 
-require_once __DIR__ . '/vendor/autoload.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/Defer/DeferredBlockReferenceNode.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/Defer/DeferTokenParser.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/ResponseContext/AddNode.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/ResponseContext/AddTokenParser.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/ResponseContext/DocumentLocation.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/Slots/SlotNode.php';
-@include_once __DIR__ . '/../../../../contao/core-bundle/src/Twig/Slots/SlotTokenParser.php';
+require_once __DIR__.'/vendor/autoload.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/Defer/DeferredBlockReferenceNode.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/Defer/DeferTokenParser.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/ResponseContext/AddNode.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/ResponseContext/AddTokenParser.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/ResponseContext/DocumentLocation.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/Slots/SlotNode.php';
+@include_once __DIR__.'/../../../../contao/core-bundle/src/Twig/Slots/SlotTokenParser.php';
 
 $ruleset = new Ruleset();
 $ruleset->addStandard(new TwigCsFixer());

@@ -11,9 +11,10 @@ $builder = ECSConfig::configure()
         '*/templates/*',
         DeclareStrictTypesFixer::class,
     ])
-    ->withCache(sys_get_temp_dir().'/ecs_contao_cache');
+    ->withCache(sys_get_temp_dir().'/ecs_contao_cache')
+;
 
-return new class ($builder) {
+return new class($builder) {
     public function __construct(private $builder)
     {
     }
