@@ -19,13 +19,46 @@ Whenever you run `composer install` or `composer update` on the project, it will
 the build tools automatically. The following tools are currently available and can be executed
 through the `composer run` command:
 
+### Monorepos
+
+For a monorepo, add a `build-tools.php` file in its root. All generated build-tool commands
+will run their default paths for each configured directory instead of the repository root:
+
+```php
+<?php
+
+return [
+    'directories' => [
+        'packages/bundle-one',
+        'packages/bundle-two',
+    ],
+];
+```
+
+The configuration is deliberately an array so it can gain additional shared options later.
+Without this file, the existing root-directory behaviour is unchanged.
+
 ### Code Style Fixer
 
 The `cs-fixer` script will fix the coding style in the `src/` directory according to the 
 latest Contao coding standards. Create an `ecs.php` script in your project
 to extend the default configuration.
 
-You can extend the default configuration by adding a `ecs.php` file to your project root.
+You can extend or override the default configuration by adding an `ecs.php` file to your project
+root. Its callback receives the configured directories as an optional second argument, which can
+be used when adding paths or configuring skips:
+
+```php
+<?php
+
+use Symplify\EasyCodingStandard\Config\ECSConfig;
+
+return static function (ECSConfig $ecsConfig, array $directories): void {
+    $ecsConfig->withSkip([
+        ...array_map(static fn (string $directory): string => $directory.'/legacy/*', $directories),
+    ]);
+};
+```
 
 ### Rector
 

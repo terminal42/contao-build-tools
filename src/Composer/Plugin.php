@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Terminal42\ContaoBuildTools\BuildToolsConfig;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
@@ -35,6 +36,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
     private Filesystem $filesystem;
 
+    private BuildToolsConfig $buildToolsConfig;
+
     public function __construct()
     {
         $this->filesystem = new Filesystem();
@@ -44,6 +47,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     {
         $scripts = [];
         $isProject = $this->isProject($composer);
+        $this->buildToolsConfig = new BuildToolsConfig((string) getcwd());
+        $directories = $this->buildToolsConfig->getDirectories();
         $phpSources = ['./src', './tests', './config/*.php' => './config'];
 
         if (!$isProject) {
@@ -61,6 +66,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'template' => ['./templates', './contao/templates'],
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -72,6 +79,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'config' => [...$phpSources, './contao', './templates', self::LEGACY_MODULES],
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -83,6 +92,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'config' => [...$phpSources, self::LEGACY_MODULES],
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -94,6 +105,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'config' => ['./composer.json'],
             ],
             $scripts,
+            true,
+            $directories,
+            false,
         );
 
         $this->registerConfigScript(
@@ -105,6 +119,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 '' => ['./config', './github'],
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -116,6 +132,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss']),
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -127,6 +145,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -138,6 +158,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/']),
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $this->registerConfigScript(
@@ -149,6 +171,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
                 'config' => ['./templates', './contao/templates'],
             ],
             $scripts,
+            true,
+            $directories,
         );
 
         $rootPackage = $composer->getPackage();
@@ -283,13 +307,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript($name, string $description, string $command, string|null $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
+    private function registerConfigScript($name, string $description, string $command, string|null $ciCommand, array $configs, array &$scripts, bool $addToTools = true, array $directories = ['.'], bool $prefixPaths = true): void
     {
         $aliases = (array) $name;
         $name = array_shift($aliases);
 
         foreach ($configs as $config => $paths) {
-            $paths = $this->filterPaths($paths);
+            $paths = $this->filterPaths($paths, $prefixPaths ? $directories : ['.']);
 
             if (empty($paths)) {
                 continue;
@@ -327,38 +351,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function filterPaths(array $paths): array
+    private function filterPaths(array $paths, array $directories): array
     {
-        $result = [];
-
-        foreach ($paths as $source => $path) {
-            $file = \is_string($source) ? $source : $path;
-
-            if (
-                !file_exists($file)
-                && (!str_contains($file, '*') || !glob($file))
-            ) {
-                continue;
-            }
-
-            if (self::LEGACY_MODULES === $path) {
-                foreach (scandir(self::LEGACY_MODULES) as $dir) {
-                    if ('.' === $dir || '..' === $dir) {
-                        continue;
-                    }
-
-                    if (is_dir(self::LEGACY_MODULES.'/'.$dir) && !is_link(self::LEGACY_MODULES.'/'.$dir)) {
-                        $result[] = self::LEGACY_MODULES.'/'.$dir;
-                    }
-                }
-
-                continue;
-            }
-
-            $result[] = $path;
-        }
-
-        return $result;
+        return $this->buildToolsConfig->filterPaths($paths, ['.'] !== $directories);
     }
 
     private function addScript(string $command, string $name, array &$scripts): void

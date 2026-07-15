@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use ShipMonk\ComposerDependencyAnalyser\Config\Configuration;
 use ShipMonk\ComposerDependencyAnalyser\Config\ErrorType;
+use Terminal42\ContaoBuildTools\BuildToolsConfig;
+
+require_once __DIR__.'/../../src/BuildToolsConfig.php';
 
 if (!file_exists(getcwd().'/composer.json')) {
     throw new RuntimeException('No composer.json found.');
@@ -33,9 +36,15 @@ if (empty($config->getPathsToScan())) {
         './tests' => true,
     ];
 
-    foreach ($paths as $path => $isDev) {
-        if (file_exists($path)) {
-            $config->addPathToScan($path, $isDev);
+    $directories = (new BuildToolsConfig((string) getcwd()))->getDirectories();
+
+    foreach ($directories as $directory) {
+        foreach ($paths as $path => $isDev) {
+            $path = '.' === $directory ? $path : './'.trim($directory, '/').'/'.ltrim($path, './');
+
+            if (file_exists($path)) {
+                $config->addPathToScan($path, $isDev);
+            }
         }
     }
 }
