@@ -1,0 +1,10 @@
+{
+    "require": {
+        "terminal42/code-quality-tools": "dev-main"
+    },
+    "config": {
+        "allow-plugins": {
+            "terminal42/code-quality-tools": true
+        }
+    }
+}

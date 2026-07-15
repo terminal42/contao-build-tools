@@ -10,7 +10,14 @@ jobs:
         name: build-tools
         runs-on: ubuntu-latest
         steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+              with:
+                  show-progress: false
+                  persist-credentials: false
+
             - name: Setup PHP
+              if: ${{ hashFiles('composer.json') != '' }}
               uses: shivammathur/setup-php@v2
               with:
                   php-version: 8.4
@@ -18,23 +25,40 @@ jobs:
                   coverage: none
 
             -   name: Install Node.js
+                if: ${{ hashFiles('package.json') != '' }}
                 uses: actions/setup-node@v6
                 with:
                     node-version: 24
-            -   run: corepack enable
 
-            - name: Checkout
-              uses: actions/checkout@v6
-              with:
-                  show-progress: false
-                  persist-credentials: false
+            -   name: Enable core pack
+                if: ${{ hashFiles('package.json') != '' }}
+                run: corepack enable
 
             - name: Install Composer dependencies
+              if: ${{ hashFiles('composer.json') != '' }}
               uses: ramsey/composer-install@v3
 
             - name: Install Node packages
               if: ${{ hashFiles('package.json') != '' }}
               run: npm install
 
-            - name: Run all build-tools to validate code
+            - name: Restore code quality caches
+              id: code-quality-cache
+              uses: actions/cache/restore@v5
+              with:
+                  path: ${{ runner.temp }}/code-quality-cache
+                  key: code-quality-${{ runner.os }}-${{ github.run_id }}
+                  restore-keys: |
+                      code-quality-${{ runner.os }}-
+
+            - name: Run all code quality tools
               run: composer run build-tools
+              env:
+                  CODE_QUALITY_CACHE_DIR: ${{ runner.temp }}/code-quality-cache
+
+            - name: Save code quality caches
+              if: ${{ !cancelled() }}
+              uses: actions/cache/save@v5
+              with:
+                  path: ${{ runner.temp }}/code-quality-cache
+                  key: ${{ steps.code-quality-cache.outputs.cache-primary-key }}

@@ -1,7 +1,0 @@
-{
-    "require": {
-        "rector/rector": "^2.0",
-        "contao/contao-rector": "dev-main",
-        "composer/semver": "^3.4"
-    }
-}

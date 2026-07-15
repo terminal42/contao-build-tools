@@ -23,9 +23,7 @@
     ],
     "require": {
         "composer-plugin-api": "^2.0",
-        "composer/semver": "^3.0",
-        "symfony/filesystem": "^3 || ^4 || ^5 || ^6 || ^7 || ^8",
-        "symfony/process": "^4.2 || ^5 || ^6 || ^7 || ^8"
+        "composer/semver": "^3.0"
     },
     "require-dev": {
         "deployer/deployer": "^7.0 || ^8.0",
@@ -48,6 +46,7 @@
     },
     "config": {
         "allow-plugins": {
+            "terminal42/code-quality-tools": true,
             "contao/manager-plugin": false
         }
     }

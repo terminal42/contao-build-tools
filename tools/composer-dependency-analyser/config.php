@@ -9,20 +9,8 @@ if (!file_exists(getcwd().'/composer.json')) {
     throw new RuntimeException('No composer.json found.');
 }
 
-$config = null;
-
-if (file_exists('./composer-dependency-analyser.php')) {
-    trigger_error('Using config '.getcwd().'/composer-dependency-analyser.php');
-    $config = require './composer-dependency-analyser.php';
-} elseif (file_exists('./depcheck.php')) {
-    trigger_error('Using config '.getcwd().'/depcheck.php');
-    @trigger_error('Please rename your "depcheck.php" file to "composer-dependency-analyser.php".', E_USER_DEPRECATED);
-    $config = require './depcheck.php';
-}
-
-if (!$config instanceof Configuration) {
-    $config = new Configuration();
-}
+/** @var Configuration $config */
+$config = require __DIR__.'/../code-quality-tools/vendor/terminal42/code-quality-tools/tools/composer-dependency-analyser/config.php';
 
 if (empty($config->getPathsToScan())) {
     $paths = [
@@ -45,9 +33,6 @@ $config
         'Gmagick',
         'Imagick',
     ])
-    ->enableAnalysisOfUnusedDevDependencies()
-    ->disableReportingUnmatchedIgnores()
-
     ->ignoreErrorsOnPackage('terminal42/contao-build-tools', [ErrorType::UNUSED_DEPENDENCY])
 ;
 

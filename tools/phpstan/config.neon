@@ -1,15 +1,4 @@
-includes:
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
-    - vendor/phpstan/phpstan-symfony/extension.neon
-    - vendor/phpstan/phpstan-symfony/rules.neon
-    - vendor/phpstan/phpstan-doctrine/extension.neon
-    - vendor/phpstan/phpstan-doctrine/rules.neon
-    - vendor/slam/phpstan-extensions/conf/symfony-rules.neon
-
 parameters:
-    level: 6
-
     dynamicConstantNames:
         - BE_USER_LOGGED_IN
 
@@ -21,12 +10,8 @@ parameters:
         - Contao\Template
         - Contao\User
 
-    treatPhpDocTypesAsCertain: false
-    reportUnmatchedIgnoredErrors: false
-    rememberPossiblyImpureFunctionValues: false
-
     doctrine:
-        objectManagerLoader: tests/object-manager.php
+        objectManagerLoader: ./object-manager.php
 
     ignoreErrors:
         - '#Access to an undefined property Contao\\DataContainer::\$activeRecord.#'
