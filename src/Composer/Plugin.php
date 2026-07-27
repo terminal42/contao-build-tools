@@ -19,7 +19,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
@@ -222,27 +221,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $originalWorkingDir = getcwd();
 
-        foreach ($binRoots as $binRoot) {
-            if (
-                $this->filesystem->exists($binRoot.'/package.json')
-                && (
-                    $this->filesystem->exists($originalWorkingDir.'/layout')
-                    || (
-                        $this->filesystem->exists($originalWorkingDir.'/assets')
-                        && !$this->isProject($composer)
-                    )
-                )
-            ) {
-                Process::fromShellCommandline('npm install')
-                    ->setWorkingDirectory($binRoot)
-                    ->mustRun(
-                        static function (string $type, string $buffer) use ($output): void {
-                            $output->write($buffer);
-                        },
-                    )
-                ;
-            }
+        // Let terminal42/code-quality-tools know where the actual project root is
+        $_ENV['PROJECT_ROOT'] = $originalWorkingDir;
 
+        foreach ($binRoots as $binRoot) {
             if ($this->filesystem->exists($binRoot.'/composer.json')) {
                 $this->executeInNamespace($application, $binRoot, $input, $output);
 
