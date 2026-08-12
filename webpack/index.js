@@ -35,10 +35,6 @@ const buildEncore = (assetsDir = 'layout', detectEntries = true) => {
         .cleanupOutputBeforeBuild()
         .disableSingleRuntimeChunk()
 
-        .configureImageRule({
-            type: 'asset',
-        })
-
         .configureBabel((config) => {
             config.plugins.push('@babel/plugin-transform-class-properties');
             config.plugins.push('@babel/plugin-transform-private-methods');
