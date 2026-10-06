@@ -17,6 +17,7 @@ const getPublicDir = () => {
 const buildReprise = async (assetsDir, detectEntries, {
     outputPath = `${ getPublicDir() }/${ assetsDir }`,
     publicPath = `/${ assetsDir }/`,
+    copy = [],
 }) => {
     const input = {};
     const sourcePath = path.resolve(assetsDir);
@@ -104,7 +105,10 @@ const buildReprise = async (assetsDir, detectEntries, {
                 outputPath,
                 publicPath,
                 manifestKeyPrefix: '',
-                copy: fs.existsSync(`${ sourcePath }/images`) ? [{ from: `${ sourcePath }/images`, to: 'images' }] : [],
+                copy: [
+                    ...(fs.existsSync(`${ sourcePath }/images`) ? [{ from: `${ sourcePath }/images`, to: 'images' }] : []),
+                    ...copy,
+                ],
             }),
             basicSsl(),
             ViteImageOptimizer({
@@ -146,6 +150,11 @@ export default (assetsDir = 'layout', detectEntries = true) => {
         },
         setPublicPath(publicPath) {
             options.publicPath = publicPath;
+            return this;
+        },
+        copyFiles(copyOptions) {
+            options.copy ??= [];
+            options.copy.push(copyOptions);
             return this;
         },
         addPlugin(plugin) {
