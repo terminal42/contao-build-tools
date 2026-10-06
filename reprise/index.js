@@ -49,8 +49,8 @@ const buildReprise = async (assetsDir, detectEntries, {
     }
 
     if (detectEntries && fs.existsSync(sourcePath)) {
-        fs.readdirSync(sourcePath, { withFileTypes: true }).filter(file => file.isFile() && file.name.endsWith('.js') && !file.name.startsWith('_')).forEach((file) => {
-            input[file.name.slice(0, -3)] = path.join(sourcePath, file.name);
+        fs.readdirSync(sourcePath, { withFileTypes: true }).filter(file => file.isFile() && /\.m?js$/.test(file.name) && !file.name.startsWith('_')).forEach((file) => {
+            input[file.name.replace(/\.m?js$/, '')] = path.join(sourcePath, file.name);
         });
     }
 

@@ -124,7 +124,7 @@ config.performance = { hints: false };
 module.exports = config;
 ```
 
-By default, it detects top-level `layout/*.js` entries (excluding `_`-prefixed
+By default, it detects top-level `layout/*.js` and `layout/*.mjs` entries (excluding `_`-prefixed
 files), outputs into the Composer `extra.public-dir` (falling back to `web` if
 present, otherwise `public`), and uses `/layout` as the public path. It cleans
 the output before building, disables the separate runtime chunk, enables source
@@ -201,7 +201,7 @@ and `addPlugin()` to append Vite plugins. Configuration callbacks run in call or
 after defaults and plugins are created; use the path setters rather than changing
 paths in `configureVite()`.
 
-Like the Encore helper, it detects top-level `layout/*.js` entries (excluding
+Like the Encore helper, it detects top-level `layout/*.js` and `layout/*.mjs` entries (excluding
 `_`-prefixed files), outputs into the Composer `extra.public-dir` (falling back to
 `web` if present, otherwise `public`), and uses `/layout/` as the public path.
 It enables Sass, source maps, output cleanup, default Autoprefixer/cssnano settings

@@ -82,14 +82,14 @@ const buildEncore = (assetsDir = 'layout', detectEntries = true) => {
 
     // Automatically detect JavaScript files in the layout folder and add Encore entries
     if (detectEntries && fs.existsSync(`${ process.cwd() }/${ assetsDir }`)) {
-        fs.readdirSync(`${ process.cwd() }/${ assetsDir }/`).filter(f => f.endsWith('.js')).forEach((file) => {
+        fs.readdirSync(`${ process.cwd() }/${ assetsDir }/`).filter(f => /\.m?js$/.test(f)).forEach((file) => {
             // Skip files with _ prefix.
             if (file.substring(0, 1) === '_') {
                 return;
             }
 
             Encore.addEntry(
-                file.substring(0, file.length - 3),
+                file.replace(/\.m?js$/, ''),
                 `./${ assetsDir }/${ file }`
             );
         });
