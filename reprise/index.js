@@ -15,8 +15,8 @@ const getPublicDir = () => {
 };
 
 const buildReprise = async (assetsDir, detectEntries, {
-    outputPath = `${ getPublicDir() }/${ assetsDir }`,
-    publicPath = `/${ assetsDir }/`,
+    outputPath = `${ getPublicDir() }/build`,
+    publicPath = '/build/',
     copy = [],
 }) => {
     const input = {};
